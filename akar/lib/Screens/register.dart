@@ -136,7 +136,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     child: Text("Have an account?"),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+
+                      Navigator.pushNamed(context, "/login");
+                    },
                     child: const Text(
                       'Log In',
                       style: TextStyle(color: Colors.deepPurple),
