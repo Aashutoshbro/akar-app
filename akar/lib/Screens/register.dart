@@ -49,8 +49,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   Image.asset(
                     "assets/auth.png",
-                    height: 120,
-                    width: 120,
+                    height: 100,
+                    width: 100,
                   ),
                   const SizedBox(height: 20.0),
                   TextField(
@@ -86,6 +86,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
                     decoration: InputDecoration(
                       labelText: 'Password',
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: _togglePasswordVisibility,
+                      ),
+
+                      // filled: true,
+                      // fillColor: const Color(0xFF9ee1d9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    //obscureText: true,
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextField(
+                    obscureText: _obscureText,
+
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
