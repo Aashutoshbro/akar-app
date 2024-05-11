@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'Screens/login.dart';
 import 'Screens/register.dart';
 import 'Screens/home.dart';
+import 'Screens/recover.dart';
 
 void main() {
   runApp(const MyApp(
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         "/": (context) => const MyHome(),
         "/register" : (context)=> const RegistrationPage(),
         "/login" : (context)=> const SignInPage(),
+        "/recover": (context)=> const RecoverPage(),
       },
       debugShowCheckedModeBanner:false,
       title: 'Flutter Demo',
