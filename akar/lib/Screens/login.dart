@@ -89,7 +89,9 @@ class _SignInPageState extends State<SignInPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/recover");
+                        },
                         child: const Text(
                           'Forgot Password?',
                         ),
