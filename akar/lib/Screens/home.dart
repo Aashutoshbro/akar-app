@@ -8,7 +8,9 @@ class MyHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body:
+      Column(
+
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Expanded(
@@ -77,6 +79,7 @@ class MyHome extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
+
                     Navigator.pushNamed(context, "/login");
                   },
                   style: ElevatedButton.styleFrom(

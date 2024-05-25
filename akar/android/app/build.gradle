@@ -1,5 +1,6 @@
 plugins {
     id "com.android.application"
+    id 'com.google.gms.google-services'
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -45,6 +46,8 @@ android {
         applicationId "com.example.akar"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        flutter.minSdkVersion=23
+        flutter.targetSdkVersion=30
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
@@ -64,4 +67,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.0.0')
+}
