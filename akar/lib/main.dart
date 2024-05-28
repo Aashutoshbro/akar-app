@@ -1,4 +1,5 @@
 import 'package:akar/Screens/splash.dart';
+import 'package:akar/admin/admin_login.dart';
 import 'package:akar/userpages/controllerpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         "/login": (context) => const SignInPage(),
         "/recover": (context) => const RecoverPage(),
         "/UserPages": (context)=> const MyCont(),
+        "/admin":(context)=> const AdminLogin(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
