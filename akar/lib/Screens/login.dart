@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-//import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -20,10 +20,14 @@ class _SignInPageState extends State<SignInPage> {
     });
   }
 
+  Future<void> saveAuthState(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+  }
+
   var formKey = GlobalKey<FormState>();
 
-  //text controllers
-
+  // text controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -35,21 +39,26 @@ class _SignInPageState extends State<SignInPage> {
           return Center(child: CircularProgressIndicator());
         },
       );
-      await FirebaseAuth.instance
+      final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim())
-          .then((uid) => {
-                Fluttertoast.showToast(msg: "Login Successfully"),
-                Navigator.of(context).pop(),
-                Navigator.pushNamed(context, "/UserPages"),
-              });
+          email: emailController.text.trim(),
+          password: passwordController.text.trim());
+
+      final userId = userCredential.user?.uid;
+
+      if (userId != null) {
+        await saveAuthState(userId);
+        Fluttertoast.showToast(msg: "Login Successfully");
+        Navigator.of(context).pop();
+        Navigator.pushReplacementNamed(context, "/UserPages");
+      }
     } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop();
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             backgroundColor: Colors.blueAccent,
             content: Text(
-              "User not for that email",
+              "User not found for that email",
               style: TextStyle(color: Colors.red),
             )));
       } else if (e.code == 'wrong-password') {
@@ -74,16 +83,17 @@ class _SignInPageState extends State<SignInPage> {
               style: TextStyle(color: Colors.red),
             )));
       } else {
-        //Fluttertoast.showToast(msg: e.toString());
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error: ${e.message}'),
           backgroundColor: Colors.red,
         ));
       }
+      emailController.clear();
+      passwordController.clear();
     }
   }
 
-  //Special regex expression for email validation
+  // Special regex expression for email validation
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter an email';
@@ -93,7 +103,7 @@ class _SignInPageState extends State<SignInPage> {
     return null;
   }
 
-  //For Password validation
+  // For Password validation
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter password';
@@ -111,9 +121,28 @@ class _SignInPageState extends State<SignInPage> {
     return null;
   }
 
+  Future<bool> showExitPopup() async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure?'),
+        content: const Text('Do you want to exit the app?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
+
   @override
   void dispose() {
-    // TODO: implement dispose
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -121,127 +150,138 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      //backgroundColor:const Color(0xFF33396d),
+    return WillPopScope(
+        onWillPop: () async {
+          bool shouldExit = await showExitPopup();
+          if (shouldExit) {
+            SystemNavigator.pop();
+            return true; // This line will not be reached as SystemNavigator.pop() closes the app
+          } else {
+            return false;
+          }
+        },
 
-      appBar: AppBar(
+
+
+
+        child: Scaffold(
+        appBar: AppBar(
         backgroundColor: Colors.transparent,
-      ),
+        automaticallyImplyLeading: false,
+    ),
       body: Center(
+
         child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
                 child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Sign In',
-                    style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Image.asset(
-                    "assets/auth3.png",
-                    height: 200,
-                    width: 200,
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: emailController,
-                    validator: validateEmail,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: const Icon(Icons.email),
-                      // filled: true,
-                      //fillColor: const Color(0xFF9ee1d9),
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
 
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  TextFormField(
-                    controller: passwordController,
-                    validator: validatePassword,
-                    obscureText: _obscureText,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: _togglePasswordVisibility,
-                      ),
 
-                      // filled: true,
-                      // fillColor: const Color(0xFF9ee1d9),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+
                     children: [
+
+                      const Text(
+                        'Sign In',
+                        style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Image.asset(
+                        "assets/auth3.png",
+                        height: 200,
+                        width: 200,
+                      ),
+                      const SizedBox(height: 20.0),
+                      TextFormField(
+                        controller: emailController,
+                        validator: validateEmail,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: const Icon(Icons.email),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10.0),
+                      TextFormField(
+                        controller: passwordController,
+                        validator: validatePassword,
+                        obscureText: _obscureText,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/recover");
+                            },
+                            child: const Text(
+                              'Forgot Password?',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Sign in logic
+                          if (formKey.currentState!.validate()) {
+                            signIn();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple),
+                        child: const Text(
+                          'SIGN IN',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(height: 10.0),
+                      const Center(
+                        child: Text("Don't have an account?"),
+                      ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, "/recover");
+                          // "create account" navigation logic here
+                          Navigator.pushNamed(context, "/register");
                         },
                         child: const Text(
-                          'Forgot Password?',
+                          'Create an account',
+                          style: TextStyle(color: Colors.deepPurple),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      //Sign in logic
-                      if (formKey.currentState!.validate()) {
-                        //After form validation
-                        signIn();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple),
-                    child: const Text(
-                      'SIGN IN',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  const Center(
-                    child: Text("Don't have an account?"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // "create account" navigation logic yaha lekhne
-                      Navigator.pushNamed(context, "/register");
-                    },
-                    child: const Text(
-                      'Create an account',
-                      style: TextStyle(color: Colors.deepPurple),
-                    ),
-                  ),
-                ],
-              ),
-            ))),
+                ))),
       ),
-    );
+    ));
   }
 }

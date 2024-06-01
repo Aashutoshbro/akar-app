@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:akar/Screens/splash.dart';
 import 'package:akar/admin/admin_login.dart';
 import 'package:akar/userpages/controllerpage.dart';
@@ -29,12 +31,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        "/": (context) => const MySplash(),
+        "/": (context) =>  MySplash(),
         "/register": (context) => const RegistrationPage(),
         "/login": (context) => const SignInPage(),
         "/recover": (context) => const RecoverPage(),
         "/UserPages": (context)=> const MyCont(),
+<<<<<<< HEAD
+        "/home":(context)=> const MyHome(),
+=======
         "/admin":(context)=> const AdminLogin(),
+>>>>>>> c9001bedd9a5d6dfc596d32eae8194d42b4437cf
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -43,3 +49,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

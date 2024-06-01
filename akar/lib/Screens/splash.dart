@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:akar/Screens/home.dart';
+import 'package:akar/userpages/controllerpage.dart';
+import 'package:akar/userpages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:observe_internet_connectivity/observe_internet_connectivity.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MySplash extends StatefulWidget {
   const MySplash({super.key});
@@ -23,6 +26,23 @@ class _MySplashState extends State<MySplash> {
     _checkConnection();
     _listenToConnectionChanges();
     _fetchInitialData();
+  }
+
+  Future<void> checkAuthState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isSignedIn = prefs.containsKey('userId');
+
+    if (isSignedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyCont()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyHome()),
+      );
+    }
   }
 
   Future<void> _checkConnection() async {
@@ -63,19 +83,13 @@ class _MySplashState extends State<MySplash> {
 
   Future<void> _fetchInitialData() async {
     // Simulate fetching data from a database or API
-    await Future.delayed(Duration(seconds: 9)); // Adjust this duration as needed
-    if (_isConnected) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MyHome()),
-      );
-    } else {
-      // Handle no internet connection scenario
-      // Show a retry button
-      _showRetryDialog();
-    }
+    await Future.delayed(Duration(seconds: 6)); // Adjust this duration as needed
+
+    // Check the authentication state after fetching initial data
+    await checkAuthState();
 
     // Cancel the subscription after a certain period
-    await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 7));
     _subscription?.cancel();
   }
 
@@ -113,7 +127,7 @@ class _MySplashState extends State<MySplash> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Lottie.asset('assets/animation/Animation3.json', width: 400),
+        child: Lottie.asset('assets/animation/Animation1.json', width: 400),
       ),
     );
   }
