@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:akar/Screens/splash.dart';
+import 'package:akar/admin/admin_login.dart';
 import 'package:akar/userpages/controllerpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,11 @@ class MyApp extends StatelessWidget {
         "/login": (context) => const SignInPage(),
         "/recover": (context) => const RecoverPage(),
         "/UserPages": (context)=> const MyCont(),
+<<<<<<< HEAD
         "/home":(context)=> const MyHome(),
+=======
+        "/admin":(context)=> const AdminLogin(),
+>>>>>>> c9001bedd9a5d6dfc596d32eae8194d42b4437cf
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

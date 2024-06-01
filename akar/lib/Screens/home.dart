@@ -1,16 +1,34 @@
 import 'package:flutter/material.dart';
 
-class MyHome extends StatelessWidget {
-  const MyHome({Key? key});
+class MyHome extends StatefulWidget {
+  const MyHome({Key? key}) : super(key: key);
 
-  get color => null;
+  @override
+  _MyHomeState createState() => _MyHomeState();
+}
+
+class _MyHomeState extends State<MyHome> {
+  int _clickCount = 0;
+  final int _requiredClicks = 5;
+
+  void _handleImageClick() {
+    setState(() {
+      _clickCount++;
+      if (_clickCount == _requiredClicks) {
+        _clickCount = 0; // Reset the count
+        _navigateToAdminLogin();
+      }
+    });
+  }
+
+  void _navigateToAdminLogin() {
+    Navigator.pushNamed(context, "/admin");
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-      Column(
-
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Expanded(
@@ -18,10 +36,13 @@ class MyHome extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.asset(
-                  'assets/Akar_logo.png',
-                  width: 200,
-                  height: 200,
+                GestureDetector(
+                  onTap: _handleImageClick,
+                  child: Image.asset(
+                    'assets/Akar_logo.png',
+                    width: 200,
+                    height: 200,
+                  ),
                 ), // Replace with your logo
                 const SizedBox(height: 10),
                 RichText(
@@ -63,7 +84,7 @@ class MyHome extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20), // Adjust padding here
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
                     height: 1,
                     color: Colors.black,
@@ -79,7 +100,6 @@ class MyHome extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-
                     Navigator.pushNamed(context, "/login");
                   },
                   style: ElevatedButton.styleFrom(
@@ -96,7 +116,6 @@ class MyHome extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-
                     Navigator.pushNamed(context, "/register");
                   },
                   child: const Text(

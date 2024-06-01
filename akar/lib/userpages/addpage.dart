@@ -5,7 +5,7 @@ class AddPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'Add Page',
+        'Add Complaint',
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
     );
