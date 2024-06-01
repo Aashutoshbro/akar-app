@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:akar/Screens/splash.dart';
 import 'package:akar/userpages/controllerpage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,11 +30,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        "/": (context) => const MySplash(),
+        "/": (context) =>  MySplash(),
         "/register": (context) => const RegistrationPage(),
         "/login": (context) => const SignInPage(),
         "/recover": (context) => const RecoverPage(),
         "/UserPages": (context)=> const MyCont(),
+        "/home":(context)=> const MyHome(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -41,3 +44,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

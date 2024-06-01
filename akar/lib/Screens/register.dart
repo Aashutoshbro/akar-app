@@ -132,6 +132,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       'name': name,
       'email': email,
       'contact': contact,
+      'Address':"Empty Address",
     });
   }
 
