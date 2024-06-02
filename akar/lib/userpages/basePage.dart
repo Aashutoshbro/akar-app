@@ -1,3 +1,4 @@
+import 'package:akar/Screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +26,7 @@ Future<void> signOut(BuildContext context) async {
   await prefs.remove('userId');
   Navigator.pushAndRemoveUntil(
     context,
-    MaterialPageRoute(builder: (context) => SignInPage()),
+    MaterialPageRoute(builder: (context) => MyHome()),
         (Route<dynamic> route) => false,
   );
 }

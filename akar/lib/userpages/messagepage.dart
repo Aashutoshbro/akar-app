@@ -22,6 +22,7 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
   List<XFile>? _selectedImages = [];
+  bool _isSubmitting = false;
 
   // Controllers for form fields
   final TextEditingController _complaintDetailsController = TextEditingController();
@@ -43,7 +44,7 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
   Future<List<String>> _uploadImages(List<XFile> images, String complaintId) async {
     List<String> downloadUrls = [];
     for (var image in images) {
-      final storageRef = FirebaseStorage.instanceFor(bucket: 'gs://demo1-3efb8.appspot.com')
+      final storageRef = FirebaseStorage.instance
           .ref()
           .child('complaints/$complaintId/${image.name}');
       final uploadTask = await storageRef.putFile(File(image.path));
@@ -146,52 +147,149 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
     }
   }
 
+  void _showSuccessDialog(BuildContext context, String complaintId) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Colors.green[100],
+          title: Column(
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Colors.green[800],
+                size: 80,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Success!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Your complaint has been submitted successfully!',
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Complaint ID: $complaintId',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Please keep this ID for future reference.',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Create a new complaint document in Firestore
-      final complaintRef = FirebaseFirestore.instance.collection('complaints').doc();
-      final complaintId = complaintRef.id;
-
-      // Upload images to Firebase Storage and get their URLs
-      List<String> imageUrls = [];
-      if (_selectedImages!.isNotEmpty) {
-        imageUrls = await _uploadImages(_selectedImages!, complaintId);
-      }
-
-      // Save the complaint data in Firestore
-      await complaintRef.set({
-        'ticketNumber': complaintRef.id,
-        'category': _category,
-        'complaintType': _complaintType,
-        'priorityLevel': _priorityLevel,
-        'natureOfComplaint': _natureOfComplaint,
-        'phoneNumber': _phoneNumberController.text,
-        'complaintDetails': _complaintDetailsController.text,
-        'location': location != null ? GeoPoint(location!.latitude, location!.longitude) : null,
-        'address': address,
-        'timestamp': FieldValue.serverTimestamp(),
-        'images': imageUrls, // Save the image URLs in the 'images' field
-      });
-
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Complaint submitted successfully!'),
-        ),
-      );
-
-      // Clear the form
       setState(() {
-        _selectedImages!.clear();
-        _complaintDetailsController.clear();
-        _phoneNumberController.clear();
-        _category = null;
-        _complaintType = null;
-        _priorityLevel = null;
-        _natureOfComplaint = null;
-        location = null;
-        address = null;
+        _isSubmitting = true; // Show progress indicator
       });
+
+      try {
+        // Create a new complaint document in Firestore
+        final complaintRef = FirebaseFirestore.instance.collection('complaints').doc();
+        final complaintId = complaintRef.id;
+
+        // Upload images to Firebase Storage and get their URLs
+        List<String> imageUrls = [];
+        if (_selectedImages!.isNotEmpty) {
+          imageUrls = await _uploadImages(_selectedImages!, complaintId);
+        }
+
+        // Save the complaint data in Firestore
+        await complaintRef.set({
+          'ticketNumber': complaintRef.id,
+          'category': _category,
+          'complaintType': _complaintType,
+          'priorityLevel': _priorityLevel,
+          'natureOfComplaint': _natureOfComplaint,
+          'phoneNumber': _phoneNumberController.text,
+          'complaintDetails': _complaintDetailsController.text,
+          'location': location != null ? GeoPoint(location!.latitude, location!.longitude) : null,
+          'address': address,
+          'timestamp': FieldValue.serverTimestamp(),
+          'images': imageUrls,
+        });
+
+        // Show a success message
+        _showSuccessDialog(context, complaintRef.id);
+
+        // Clear the form
+        setState(() {
+          _selectedImages!.clear();
+          _complaintDetailsController.clear();
+          _phoneNumberController.clear();
+          _category = null;
+          _complaintType = null;
+          _priorityLevel = null;
+          _natureOfComplaint = null;
+          location = null;
+          address = null;
+        });
+      } catch (e) {
+        // Handle any errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isSubmitting = false; // Hide progress indicator
+        });
+      }
     }
   }
 
@@ -206,7 +304,9 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+
                 children: <Widget>[
+                  const SizedBox(height: 4),
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(
                       labelText: 'Select Category',
@@ -399,6 +499,7 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
                   if (_selectedImages!.isNotEmpty)
                     GridView.builder(
                       shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
@@ -498,28 +599,38 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
                       ],
                     ),
                   const SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   Center(
-                      child: SizedBox(
-                    width: 120,
-                    height: 49,
-                    child: ElevatedButton(
-                      onPressed: _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        // minimumSize: const Size(120, 49),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(
+                      width: 120,
+                      height: 49,
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isSubmitting ? Colors.grey : Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                        child: _isSubmitting
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.deepPurple,
+                            strokeWidth: 3,
+                          ),
+                        )
+                            : const Text(
+                          'Submit',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ),
