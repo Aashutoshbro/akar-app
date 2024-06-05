@@ -1,7 +1,7 @@
 import "package:akar/userpages/profilepage.dart";
 import "package:flutter/material.dart";
 import "basePage.dart";
- // Import the BasePage widget
+// Import the BasePage widget
 
 import "../Screens/login.dart";
 import "addpage.dart";
@@ -10,6 +10,7 @@ import "messagepage.dart";
 import "notificationpage.dart";
 
 class MyCont extends StatefulWidget {
+
   const MyCont({super.key});
 
   @override
@@ -19,8 +20,8 @@ class MyCont extends StatefulWidget {
 class _MyContState extends State<MyCont> {
   int page = 0;
 
-  final List<Widget> _pages = [
-    HomePage(),
+  late final List<Widget> _pages = [
+    HomePage(onPageChanged: _onPageChanged,),
     RegisterComplaintForm(),
     AddPage(),
     NotificationsPage(),
