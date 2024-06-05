@@ -15,12 +15,12 @@ import 'Screens/recover.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-      options: FirebaseOptions(
-          apiKey: 'AIzaSyCxzPHuDDAfduqnMUE5Wymgdwc5TwHhu4o',
-          appId: '1:897372433402:android:4ace3450735673096d9243',
-          messagingSenderId: '897372433402',
-          projectId: 'demo1-3efb8',
-        storageBucket:'gs://demo1-3efb8.appspot.com' ),
+    options: FirebaseOptions(
+        apiKey: 'AIzaSyCxzPHuDDAfduqnMUE5Wymgdwc5TwHhu4o',
+        appId: '1:897372433402:android:4ace3450735673096d9243',
+        messagingSenderId: '897372433402',
+        projectId: 'demo1-3efb8',
+        storageBucket: 'gs://demo1-3efb8.appspot.com'),
   );
   runApp(const MyApp());
 }
@@ -33,15 +33,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        "/": (context) =>  MySplash(),
+        "/": (context) => MySplash(),
         "/register": (context) => const RegistrationPage(),
         "/login": (context) => const SignInPage(),
         "/recover": (context) => const RecoverPage(),
-        "/UserPages": (context)=> const MyCont(),
+        "/UserPages": (context) => const MyCont(),
 
-        "/home":(context)=> const MyHome(),
+        "/home": (context) => const MyHome(),
 
-        "/admin":(context)=> const AdminLogin(),
+        "/admin": (context) => const AdminLogin(),
 
       },
       debugShowCheckedModeBanner: false,
