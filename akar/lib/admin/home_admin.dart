@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'list_users.dart';
 class HomeAdmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -22,8 +24,13 @@ class ComplaintsHomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
-            onPressed: () {},
-          ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UsersPage()),
+              );
+            },
+          )
         ],
       ),
       body: Column(
