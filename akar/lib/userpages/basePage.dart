@@ -32,6 +32,8 @@ Future<void> signOut(BuildContext context) async {
 }
 
 class _BasePageState extends State<BasePage> {
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -39,7 +41,7 @@ class _BasePageState extends State<BasePage> {
         final shouldExit = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Do you want to exit the app?',style: TextStyle(fontSize: 18),),
+            title: const Text('Do you want to exit the app?', style: TextStyle(fontSize: 18)),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -55,7 +57,6 @@ class _BasePageState extends State<BasePage> {
         if (shouldExit ?? false) {
           SystemNavigator.pop(); // This exits the app
           return true;
-
         }
         return false;
       },
@@ -124,7 +125,9 @@ class _BasePageState extends State<BasePage> {
             ],
           ),
         ),
-        body: widget.page,
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : widget.page,
         bottomNavigationBar: CurvedNavigationBar(
           backgroundColor: Colors.transparent,
           buttonBackgroundColor: Colors.deepPurple,
@@ -132,12 +135,26 @@ class _BasePageState extends State<BasePage> {
           animationDuration: const Duration(milliseconds: 200),
           items: const [
             Icon(Icons.home, color: Colors.white),
-            Icon(Icons.message, color: Colors.white),
             Icon(Icons.add, color: Colors.white),
             Icon(Icons.notifications_on, color: Colors.white),
             Icon(Icons.person, color: Colors.white),
           ],
-          onTap: widget.onPageChanged,
+          onTap: (index) async {
+            if (index == 1) { // Register Complaint page
+              setState(() {
+                _isLoading = true;
+              });
+
+              // Simulate a delay to load the form
+              await Future.delayed(Duration(seconds: 2));
+
+              setState(() {
+                _isLoading = false;
+              });
+            }
+
+            widget.onPageChanged(index);
+          },
           index: widget.pageIndex,
         ),
       ),
@@ -151,10 +168,8 @@ class _BasePageState extends State<BasePage> {
       case 1:
         return Text("Register Complaint", style: TextStyle(fontSize: 20, color: Colors.white));
       case 2:
-        return Text("Add", style: TextStyle(fontSize: 20, color: Colors.white));
-      case 3:
         return Text("Notifications", style: TextStyle(fontSize: 20, color: Colors.white));
-      case 4:
+      case 3:
         return Text("My Profile", style: TextStyle(fontSize: 20, color: Colors.white));
       default:
         return Text("App");

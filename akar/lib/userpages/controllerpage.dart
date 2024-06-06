@@ -4,7 +4,7 @@ import "basePage.dart";
 // Import the BasePage widget
 
 import "../Screens/login.dart";
-import "addpage.dart";
+
 import "homepage.dart";
 import "messagepage.dart";
 import "notificationpage.dart";
@@ -21,9 +21,9 @@ class _MyContState extends State<MyCont> {
   int page = 0;
 
   late final List<Widget> _pages = [
+
     HomePage(onPageChanged: _onPageChanged,),
     RegisterComplaintForm(),
-    AddPage(),
     NotificationsPage(),
     UserProfile(),
   ];
