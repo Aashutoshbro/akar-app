@@ -9,6 +9,7 @@ class HomePage extends StatefulWidget {
   final Function(int) onPageChanged;
 
   const HomePage({Key? key, required this.onPageChanged}) : super(key: key);
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -22,7 +23,8 @@ class _HomePageState extends State<HomePage> {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists && userDoc.data() != null) {
           return userDoc['name'] ?? 'Guest';
         } else {
@@ -64,17 +66,20 @@ class _HomePageState extends State<HomePage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text(
                           'Loading...',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       } else if (snapshot.hasError || !snapshot.hasData) {
                         return Text(
                           'Error',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       } else {
                         return Text(
                           snapshot.data ?? 'Guest',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       }
                     },
@@ -98,7 +103,10 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ComplaintHistory(onPageChanged: (int ) {  },)),
+                      MaterialPageRoute(
+                          builder: (context) => ComplaintHistory(
+                                onPageChanged: (int) {},
+                              )),
                     );
                   },
                   child: Text("Complain History"),
@@ -107,7 +115,8 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => TrackComplaintPage()),
+                      MaterialPageRoute(
+                          builder: (context) => TrackComplaintPage()),
                     );
                   },
                   child: Text("Track Complaint"),
@@ -121,7 +130,8 @@ class _HomePageState extends State<HomePage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
                 'Register Complaint',
