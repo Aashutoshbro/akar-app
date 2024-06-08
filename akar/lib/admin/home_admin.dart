@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'list_users.dart';
+
 class HomeAdmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,12 +22,23 @@ class ComplaintsHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {},
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white), // Set the back icon color to white
+          onPressed: () {
+            _onItemTapped(0);
+            Navigator.pop(context); // Navigate back
+          },
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white, // Set the back icon color to white
+        ),
+        backgroundColor: Colors.deepPurple,
+        title: Text(
+          'Manage Complaint',
+          style: TextStyle(
+            color: Colors.white, // Set the title text color to white
           ),
-        ],
+        ),
       ),
       body: Column(
         children: [
@@ -44,7 +58,6 @@ class ComplaintsHomePage extends StatelessWidget {
                     Text('Admin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   ],
                 ),
-
               ],
             ),
           ),
@@ -96,27 +109,16 @@ class ComplaintsHomePage extends StatelessWidget {
                   complaintText: 'Issue about low power supply to my home',
                   urgency: 'Urgent',
                 ),
-                ComplaintCard(
-                  name: 'Aashutosh Sapkota',
-                  time: '20 May 2024 08:10 PM',
-                  complaintId: '100',
-                  complaintText: 'Drainage Leakage',
-                  urgency: 'Urgent',
-                ),
-                ComplaintCard(
-                  name: 'Abhishek Sharma',
-                  time: '27 May 2024 7:30 AM',
-                  complaintId: '113',
-                  complaintText: 'Street light pole current leakage',
-                  urgency: 'Urgent',
-                ),
-
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _onItemTapped(int index) {
+    // Define your logic for _onItemTapped here
   }
 }
 
