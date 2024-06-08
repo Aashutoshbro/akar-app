@@ -1,4 +1,5 @@
-import 'package:akar/admin/home_admin.dart';
+
+import 'package:akar/admin/page_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -179,7 +180,7 @@ class _AdminLoginState extends State<AdminLogin> {
                 style: TextStyle(fontSize: 18.0),
               )));
         } else {
-          Route route = MaterialPageRoute(builder: (context) => HomeAdmin());
+          Route route = MaterialPageRoute(builder: (context) => PageManager());
           Navigator.pushReplacement(context, route);
         }
       });

@@ -54,6 +54,7 @@ dependencies:
   geolocator: ^8.2.1
   firebase_storage: ^11.7.7
   mask_text_input_formatter: ^2.4.0
+  google_nav_bar: ^5.0.6
 
 
 
