@@ -5,21 +5,22 @@ class User {
   final String name;
   final String contact;
   final String email;
-  // final String avatarUrl;
+  final String? profileImageURL;
 
   User({
     required this.name,
     required this.contact,
     required this.email,
-    // required this.avatarUrl,
+    this.profileImageURL,
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
+    var data = doc.data() as Map<String, dynamic>; // Ensuring the data is treated as a Map
     return User(
-      name: doc['name'],
-      contact: doc['contact'],
-      email: doc['email'],
-      // avatarUrl: doc['avatarUrl'],
+      name: data['name'],
+      contact: data['contact'],
+      email: data['email'],
+      profileImageURL: data.containsKey('profileImageURL') ? data['profileImageURL'] : null,
     );
   }
 }
@@ -84,17 +85,6 @@ class _UsersPageState extends State<UsersPage> {
             color: Colors.white, // Adjust text color for contrast
           ),
         ),
-        actions: [
-          // IconButton(
-          //   icon: Icon(
-          //     Icons.add,
-          //     color: Colors.white,
-          //   ),
-          //   onPressed: () {
-          //     // Handle add user action
-          //   },
-          // ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -114,7 +104,6 @@ class _UsersPageState extends State<UsersPage> {
               ),
             ),
             SizedBox(height: 10),
-            TabBarViewWidget(),
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredUsers.length,
@@ -130,34 +119,6 @@ class _UsersPageState extends State<UsersPage> {
   }
 }
 
-class TabBarViewWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Column(
-        children: [
-          // TabBar(
-          //   isScrollable: true,
-          //   labelColor: Colors.black,
-          //   unselectedLabelColor: Colors.grey,
-          //   indicatorColor: Colors.blue,
-          //   tabs: [
-          //     Tab(text: 'All'),
-          //     Tab(text: 'Dispatchers'),
-          //     Tab(text: 'Administrators'),
-          //     Tab(text: 'Technicians'),
-          //   ],
-          // ),
-          SizedBox(
-            height: 0, // Placeholder for TabBarView
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class UserCard extends StatelessWidget {
   final User user;
 
@@ -168,11 +129,15 @@ class UserCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        // leading: SvgPicture.network(
-        //   user.avatarUrl,
-        //   width: 50,
-        //   height: 50,
-        // ),
+        leading: user.profileImageURL != null
+            ? CircleAvatar(
+          backgroundImage: NetworkImage(user.profileImageURL!),
+          radius: 25,
+        )
+            : CircleAvatar(
+          child: Icon(Icons.person),
+          radius: 25,
+        ),
         title: Text(user.name),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,8 +147,9 @@ class UserCard extends StatelessWidget {
             Text(user.email),
           ],
         ),
-        trailing: Icon(Icons.edit,
-        color: Colors.deepPurple,
+        trailing: Icon(
+          Icons.edit,
+          color: Colors.deepPurple,
         ),
         isThreeLine: true,
       ),
