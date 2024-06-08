@@ -16,15 +16,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<String> _getFullName() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(user.uid).get();
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists && userDoc.data() != null) {
           return userDoc['name'] ?? 'Guest';
         } else {
@@ -39,6 +37,25 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<String?> _getProfileImageURL() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists && userDoc.data() != null) {
+          return userDoc['profileImageURL'];
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching profile image URL: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,9 +65,26 @@ class _HomePageState extends State<HomePage> {
           onTap: () {},
           child: Row(
             children: [
-              CircleAvatar(
-                backgroundColor: Colors.grey.shade300,
-                child: Icon(Icons.person, color: Colors.purple),
+              FutureBuilder<String?>(
+                future: _getProfileImageURL(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircleAvatar(
+                      backgroundColor: Colors.grey.shade300,
+                      child: Icon(Icons.person, color: Colors.purple),
+                    );
+                  } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+                    return CircleAvatar(
+                      backgroundColor: Colors.grey.shade300,
+                      child: Icon(Icons.person, color: Colors.purple),
+                    );
+                  } else {
+                    return CircleAvatar(
+                      backgroundImage: NetworkImage(snapshot.data!),
+                      backgroundColor: Colors.grey.shade300,
+                    );
+                  }
+                },
               ),
               SizedBox(width: 10),
               Column(
@@ -66,20 +100,17 @@ class _HomePageState extends State<HomePage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text(
                           'Loading...',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       } else if (snapshot.hasError || !snapshot.hasData) {
                         return Text(
                           'Error',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       } else {
                         return Text(
                           snapshot.data ?? 'Guest',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       }
                     },
@@ -104,9 +135,10 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ComplaintHistory(
-                                onPageChanged: (int) {},
-                              )),
+                        builder: (context) => ComplaintHistory(
+                          onPageChanged: (int) {},
+                        ),
+                      ),
                     );
                   },
                   child: Text("Complain History"),
@@ -115,8 +147,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => TrackComplaintPage()),
+                      MaterialPageRoute(builder: (context) => TrackComplaintPage()),
                     );
                   },
                   child: Text("Track Complaint"),
@@ -130,8 +161,7 @@ class _HomePageState extends State<HomePage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
                 'Register Complaint',
