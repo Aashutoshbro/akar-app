@@ -625,7 +625,7 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
                   SizedBox(height: 20),
                   TextFormField(
                     decoration: InputDecoration(
-                      labelText: 'Sreet Name',
+                      labelText: 'Street Name',
                       hintText: 'e.g. Bishal Chowk',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
