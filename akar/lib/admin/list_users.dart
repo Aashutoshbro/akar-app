@@ -15,12 +15,14 @@ class User {
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
-    var data = doc.data() as Map<String, dynamic>; // Ensuring the data is treated as a Map
+    var data = doc.data()
+        as Map<String, dynamic>; // Ensuring the data is treated as a Map
     return User(
       name: data['name'],
       contact: data['contact'],
       email: data['email'],
-      profileImageURL: data.containsKey('profileImageURL') ? data['profileImageURL'] : null,
+      profileImageURL:
+          data.containsKey('profileImageURL') ? data['profileImageURL'] : null,
     );
   }
 }
@@ -43,8 +45,12 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   void _fetchUsers() async {
-    FirebaseFirestore.instance.collection('users').snapshots().listen((snapshot) {
-      List<User> users = snapshot.docs.map((doc) => User.fromDocument(doc)).toList();
+    FirebaseFirestore.instance
+        .collection('users')
+        .snapshots()
+        .listen((snapshot) {
+      List<User> users =
+          snapshot.docs.map((doc) => User.fromDocument(doc)).toList();
       setState(() {
         _allUsers = users;
         _filteredUsers = users;
@@ -57,9 +63,9 @@ class _UsersPageState extends State<UsersPage> {
     setState(() {
       _filteredUsers = _allUsers
           .where((user) =>
-      user.name.toLowerCase().contains(query) ||
-          user.contact.toLowerCase().contains(query) ||
-          user.email.toLowerCase().contains(query))
+              user.name.toLowerCase().contains(query) ||
+              user.contact.toLowerCase().contains(query) ||
+              user.email.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -131,13 +137,13 @@ class UserCard extends StatelessWidget {
       child: ListTile(
         leading: user.profileImageURL != null
             ? CircleAvatar(
-          backgroundImage: NetworkImage(user.profileImageURL!),
-          radius: 25,
-        )
+                backgroundImage: NetworkImage(user.profileImageURL!),
+                radius: 25,
+              )
             : CircleAvatar(
-          child: Icon(Icons.person),
-          radius: 25,
-        ),
+                child: Icon(Icons.person),
+                radius: 25,
+              ),
         title: Text(user.name),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +154,7 @@ class UserCard extends StatelessWidget {
           ],
         ),
         trailing: Icon(
-          Icons.edit,
+          Icons.visibility,
           color: Colors.deepPurple,
         ),
         isThreeLine: true,

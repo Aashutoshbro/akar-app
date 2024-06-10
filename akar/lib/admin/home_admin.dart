@@ -1,18 +1,20 @@
+import 'package:akar/admin/solve_complaint.dart';
 import 'package:flutter/material.dart';
-
-import 'list_users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeAdmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Complaints App',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Manage Complaint',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.deepPurple,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      home: ComplaintsHomePage(),
+      body: ComplaintsHomePage(),
     );
   }
 }
@@ -20,105 +22,97 @@ class HomeAdmin extends StatelessWidget {
 class ComplaintsHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white), // Set the back icon color to white
-          onPressed: () {
-            _onItemTapped(0);
-            Navigator.pop(context); // Navigate back
-          },
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white, // Set the back icon color to white
-        ),
-        backgroundColor: Colors.deepPurple,
-        title: Text(
-          'Manage Complaint',
-          style: TextStyle(
-            color: Colors.white, // Set the title text color to white
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.grey.shade300,
+                child: Icon(Icons.person, color: Colors.purple),
+              ),
+              SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Namaste', style: TextStyle(fontSize: 16)),
+                  Text('Admin',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ],
           ),
         ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.grey.shade300,
-                  child: Icon(Icons.person, color: Colors.purple),
-                ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Namaste', style: TextStyle(fontSize: 16)),
-                    Text('Admin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Complaints',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search Complaints',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                FilterChip(label: Text('All'), onSelected: (bool value) {}),
-                FilterChip(label: Text('Urgent'), onSelected: (bool value) {}),
-                FilterChip(label: Text('Medium'), onSelected: (bool value) {}),
-                FilterChip(label: Text('Low'), onSelected: (bool value) {}),
-              ],
-            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FilterChip(label: Text('All'), onSelected: (bool value) {}),
+              FilterChip(label: Text('Urgent'), onSelected: (bool value) {}),
+              FilterChip(label: Text('Medium'), onSelected: (bool value) {}),
+              FilterChip(label: Text('Low'), onSelected: (bool value) {}),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'We found "10 Urgent complaints", so please try to focus urgent complaints first.',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              children: [
-                ComplaintCard(
-                  name: 'Rajeev Paudel',
-                  time: '28 May 2024 08:12 AM',
-                  complaintId: '120',
-                  complaintText: 'Regarding overflowing home water tank',
-                  urgency: 'Urgent',
-                ),
-                ComplaintCard(
-                  name: 'Kishan Pathak',
-                  time: '26 May 2024 10:30 AM',
-                  complaintId: '110',
-                  complaintText: 'Issue about low power supply to my home',
-                  urgency: 'Urgent',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        Expanded(
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance.collection('complaints').snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (!snapshot.hasData) {
+                return Center(child: CircularProgressIndicator());
+              }
 
-  void _onItemTapped(int index) {
-    // Define your logic for _onItemTapped here
+              var complaints = snapshot.data!.docs;
+              var urgentComplaints = complaints.where((doc) => doc['natureOfComplaint'] == 'Urgent').toList();
+              var urgentCount = urgentComplaints.length;
+
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'We found "$urgentCount Urgent complaints", focus on solving problem based on priority',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: complaints.length,
+                      itemBuilder: (context, index) {
+                        var complaint = complaints[index];
+                        return ComplaintCard(
+                          name: complaint['fullName'],
+                          time: complaint['timestamp'].toDate().toString(),
+                          complaintId: complaint['ticketNumber'],
+                          complaintText: complaint['complaintDetails'],
+                          streetName: complaint['streetName'],
+                          wardNumber: complaint['wardNumber'],
+                          urgency: complaint['natureOfComplaint'],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -127,6 +121,8 @@ class ComplaintCard extends StatelessWidget {
   final String time;
   final String complaintId;
   final String complaintText;
+  final String streetName;
+  final String wardNumber;
   final String urgency;
 
   ComplaintCard({
@@ -134,6 +130,8 @@ class ComplaintCard extends StatelessWidget {
     required this.time,
     required this.complaintId,
     required this.complaintText,
+    required this.streetName,
+    required this.wardNumber,
     required this.urgency,
   });
 
@@ -141,32 +139,56 @@ class ComplaintCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.grey.shade300,
-          child: Icon(Icons.person, color: Colors.purple),
-        ),
-        title: Text(name),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(time),
-            SizedBox(height: 4),
-            Text(
-              complaintText,
-              style: TextStyle(color: Colors.grey.shade600),
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.grey.shade300,
+                child: Icon(Icons.person, color: Colors.purple),
+              ),
+              title: Text(name),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(time),
+                  SizedBox(height: 4),
+                  Text(
+                    complaintText,
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Street: $streetName',
+                    style: TextStyle(color: Colors.grey.shade800),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Ward: $wardNumber',
+                    style: TextStyle(color: Colors.grey.shade800),
+                  ),
+                ],
+              ),
+
+                  trailing: IconButton(
+                    icon: Icon(Icons.visibility, color: Colors.purple),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ComplaintDetailPage()),
+                      );
+                    },
+                  ),
             ),
-          ],
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              urgency,
-              style: TextStyle(color: Colors.red),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+              child: Text(
+                urgency,
+                style: TextStyle(color: Colors.red),
+              ),
             ),
-            SizedBox(height: 4),
-            Icon(Icons.phone, color: Colors.purple),
           ],
         ),
       ),
