@@ -5,7 +5,7 @@ class ComplaintDetailPage extends StatelessWidget {
   final String contact = 'Contact: 9869058801';
   final String cid = 'Cid: 88-44-1080';
   final String ticketNumber = 'Ticket Number: rvh01';
-  final String complaintDetails= "There is a large pothole on the main road.";
+  final String complaintDetails = "There is a large pothole on the main road.";
   final String complaintType = 'Overflowing home water tank';
   final String category = 'Water Supply';
   final String status = 'Raised';
@@ -40,7 +40,8 @@ class ComplaintDetailPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                    backgroundImage: NetworkImage(
+                        'https://via.placeholder.com/150'),
                   ),
                   SizedBox(width: 16),
                   Expanded(
@@ -49,7 +50,8 @@ class ComplaintDetailPage extends StatelessWidget {
                       children: [
                         Text(
                           name,
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight
+                              .bold),
                         ),
                         Text(
                           contact,
@@ -81,7 +83,8 @@ class ComplaintDetailPage extends StatelessWidget {
                     Center(
                       child: Text(
                         'Complaint Details',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
                     SizedBox(height: 20),
@@ -91,35 +94,41 @@ class ComplaintDetailPage extends StatelessWidget {
                         SizedBox(height: 10),
                         Text(
                           'Description:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
-                        Text('$complaintDetails', style: TextStyle(fontSize: 16)),
+                        Text('$complaintDetails',
+                            style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Complaint Type:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$complaintType', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Category:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$category', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Status:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$status', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Date:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$date', style: TextStyle(fontSize: 16)),
@@ -132,9 +141,11 @@ class ComplaintDetailPage extends StatelessWidget {
                           // Add your onPressed action here
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple, // Background color
+                          backgroundColor: Colors
+                              .deepPurple, // Background color
                         ),
-                        child: Text('View Image', style: TextStyle(color: Colors.white)),
+                        child: Text('View Image', style: TextStyle(color: Colors
+                            .white)),
                       ),
                     ),
                   ],
@@ -153,7 +164,8 @@ class ComplaintDetailPage extends StatelessWidget {
                     Center(
                       child: Text(
                         'Location Details',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
                     SizedBox(height: 20),
@@ -163,28 +175,32 @@ class ComplaintDetailPage extends StatelessWidget {
                         SizedBox(height: 10),
                         Text(
                           'Landmark:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$landmark', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Location:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$location', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Street Name',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$streetName', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
                           'Ward Number:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight
+                              .bold),
                         ),
                         SizedBox(height: 5),
                         Text('$wardNumber', style: TextStyle(fontSize: 16)),
@@ -197,9 +213,11 @@ class ComplaintDetailPage extends StatelessWidget {
                           // Add your onPressed action here
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple, // Background color
+                          backgroundColor: Colors
+                              .deepPurple, // Background color
                         ),
-                        child: Text('Track Location', style: TextStyle(color: Colors.white)),
+                        child: Text('Track Location', style: TextStyle(
+                            color: Colors.white)),
                       ),
                     ),
                   ],

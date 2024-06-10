@@ -38,7 +38,8 @@ class ComplaintsHomePage extends StatelessWidget {
                 children: [
                   Text('Namaste', style: TextStyle(fontSize: 16)),
                   Text('Admin',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
                 ],
               ),
             ],
@@ -70,14 +71,16 @@ class ComplaintsHomePage extends StatelessWidget {
         ),
         Expanded(
           child: StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('complaints').snapshots(),
+            stream: FirebaseFirestore.instance.collection('complaints')
+                .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {
                 return Center(child: CircularProgressIndicator());
               }
 
               var complaints = snapshot.data!.docs;
-              var urgentComplaints = complaints.where((doc) => doc['natureOfComplaint'] == 'Urgent').toList();
+              var urgentComplaints = complaints.where((
+                  doc) => doc['natureOfComplaint'] == 'Urgent').toList();
               var urgentCount = urgentComplaints.length;
 
               return Column(
@@ -172,15 +175,16 @@ class ComplaintCard extends StatelessWidget {
                 ],
               ),
 
-                  trailing: IconButton(
-                    icon: Icon(Icons.visibility, color: Colors.purple),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ComplaintDetailPage()),
-                      );
-                    },
-                  ),
+              trailing: IconButton(
+                icon: Icon(Icons.visibility, color: Colors.purple),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ComplaintDetailPage()),
+                  );
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
