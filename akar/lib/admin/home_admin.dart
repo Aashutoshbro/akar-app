@@ -19,7 +19,14 @@ class HomeAdmin extends StatelessWidget {
   }
 }
 
-class ComplaintsHomePage extends StatelessWidget {
+class ComplaintsHomePage extends StatefulWidget {
+  @override
+  _ComplaintsHomePageState createState() => _ComplaintsHomePageState();
+}
+
+class _ComplaintsHomePageState extends State<ComplaintsHomePage> {
+  String _selectedFilter = 'All';
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -62,25 +69,54 @@ class ComplaintsHomePage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              FilterChip(label: Text('All'), onSelected: (bool value) {}),
-              FilterChip(label: Text('Urgent'), onSelected: (bool value) {}),
-              FilterChip(label: Text('Medium'), onSelected: (bool value) {}),
-              FilterChip(label: Text('Low'), onSelected: (bool value) {}),
+              FilterChip(
+                label: Text('All'),
+                selected: _selectedFilter == 'All',
+                onSelected: (bool value) {
+                  setState(() {
+                    _selectedFilter = 'All';
+                  });
+                },
+              ),
+              FilterChip(
+                label: Text('Pending'),
+                selected: _selectedFilter == 'Pending',
+                onSelected: (bool value) {
+                  setState(() {
+                    _selectedFilter = 'Pending';
+                  });
+                },
+              ),
+              FilterChip(
+                label: Text('Resolved'),
+                selected: _selectedFilter == 'Resolved',
+                onSelected: (bool value) {
+                  setState(() {
+                    _selectedFilter = 'Resolved';
+                  });
+                },
+              ),
             ],
           ),
         ),
         Expanded(
           child: StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('complaints')
-                .snapshots(),
+            stream: FirebaseFirestore.instance.collection('complaints').snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {
                 return Center(child: CircularProgressIndicator());
               }
 
               var complaints = snapshot.data!.docs;
-              var urgentComplaints = complaints.where((
-                  doc) => doc['natureOfComplaint'] == 'Urgent').toList();
+
+              // Filter complaints based on the selected filter
+              if (_selectedFilter == 'Pending') {
+                complaints = complaints.where((doc) => doc['status'] != 'Complaint Resolved').toList();
+              } else if (_selectedFilter == 'Resolved') {
+                complaints = complaints.where((doc) => doc['status'] == 'Complaint Resolved').toList();
+              }
+
+              var urgentComplaints = complaints.where((doc) => doc['natureOfComplaint'] == 'Urgent').toList();
               var urgentCount = urgentComplaints.length;
 
               return Column(
@@ -105,6 +141,7 @@ class ComplaintsHomePage extends StatelessWidget {
                           streetName: complaint['streetName'],
                           wardNumber: complaint['wardNumber'],
                           urgency: complaint['natureOfComplaint'],
+                          status: complaint['status'],  // Include status
                         );
                       },
                     ),
@@ -127,6 +164,7 @@ class ComplaintCard extends StatelessWidget {
   final String streetName;
   final String wardNumber;
   final String urgency;
+  final String status;
 
   ComplaintCard({
     required this.name,
@@ -136,10 +174,26 @@ class ComplaintCard extends StatelessWidget {
     required this.streetName,
     required this.wardNumber,
     required this.urgency,
+    required this.status,  // Include status
   });
 
   @override
   Widget build(BuildContext context) {
+    IconData statusIcon;
+    Color statusColor;
+    String statusText;
+
+    // Determine the icon, color, and text based on the status
+    if (status == 'Complaint Resolved') {
+      statusIcon = Icons.check_circle_outline;
+      statusColor = Colors.green;
+      statusText = 'Resolved';
+    } else {
+      statusIcon = Icons.hourglass_empty;
+      statusColor = Colors.orange;
+      statusText = 'In Progress';
+    }
+
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -148,11 +202,28 @@ class ComplaintCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
+              contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundColor: Colors.grey.shade300,
                 child: Icon(Icons.person, color: Colors.purple),
               ),
-              title: Text(name),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(statusIcon, color: statusColor),
+                      SizedBox(width: 5),
+                      Text(
+                        statusText,
+                        style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Text(name),
+                ],
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -174,7 +245,6 @@ class ComplaintCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               trailing: IconButton(
                 icon: Icon(Icons.visibility, color: Colors.purple),
                 onPressed: () {

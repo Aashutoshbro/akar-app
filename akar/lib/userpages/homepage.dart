@@ -1,4 +1,3 @@
-import 'package:akar/userpages/track_complaint.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +21,8 @@ class _HomePageState extends State<HomePage> {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists && userDoc.data() != null) {
           return userDoc['name'] ?? 'Guest';
         } else {
@@ -41,7 +41,8 @@ class _HomePageState extends State<HomePage> {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists && userDoc.data() != null) {
           return userDoc['profileImageURL'];
         } else {
@@ -73,7 +74,9 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: Colors.grey.shade300,
                       child: Icon(Icons.person, color: Colors.purple),
                     );
-                  } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+                  } else if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data == null) {
                     return CircleAvatar(
                       backgroundColor: Colors.grey.shade300,
                       child: Icon(Icons.person, color: Colors.purple),
@@ -100,17 +103,20 @@ class _HomePageState extends State<HomePage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text(
                           'Loading...',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       } else if (snapshot.hasError || !snapshot.hasData) {
                         return Text(
                           'Error',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       } else {
                         return Text(
                           snapshot.data ?? 'Guest',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         );
                       }
                     },
@@ -143,15 +149,15 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Text("Complain History"),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TrackComplaintPage()),
-                    );
-                  },
-                  child: Text("Track Complaint"),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => TrackComplaintPage()),
+                //     );
+                //   },
+                //   child: Text("Track Complaint"),
+                // ),
               ],
             ),
             SizedBox(height: 20),
@@ -161,7 +167,8 @@ class _HomePageState extends State<HomePage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
                 'Register Complaint',
