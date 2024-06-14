@@ -1,10 +1,11 @@
+import 'package:akar/userpages/track_complaint.dart';
 import 'package:flutter/material.dart';
 
 class ComplaintHistory extends StatefulWidget {
   final Function(int) onPageChanged;
 
-
-  const ComplaintHistory({Key? key, required this.onPageChanged}) : super(key: key);
+  const ComplaintHistory({Key? key, required this.onPageChanged})
+      : super(key: key);
 
   @override
   State<ComplaintHistory> createState() => _ComplaintHistoryState();
@@ -16,8 +17,10 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-          color: Colors.white,),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -26,7 +29,8 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
             color: Colors.white, // Adjust text color for contrast
           ),
         ),
-        backgroundColor: Colors.deepPurple, // Dark purple background for the entire app bar
+        backgroundColor:
+            Colors.deepPurple, // Dark purple background for the entire app bar
       ),
       body: ListView(
         children: [
@@ -34,7 +38,8 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
             status: 'In Progress',
             ticketNo: '#214',
             category: 'Plumbing',
-            description: 'Water tap and sink pipe leakage, needs urgent work by plumber.',
+            description:
+                'Water tap and sink pipe leakage, needs urgent work by plumber.',
             imageUrl: 'https://via.placeholder.com/150',
             actions: [
               ElevatedButton(
@@ -42,7 +47,13 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
                 child: Text('WITHDRAW'),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TrackComplaintPage()),
+                  );
+                },
                 child: Text('TRACK'),
               ),
             ],
@@ -51,7 +62,8 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
             status: 'In Progress',
             ticketNo: '#214',
             category: 'Plumbing',
-            description: 'Water tap and sink pipe leakage, needs urgent work by plumber.',
+            description:
+                'Water tap and sink pipe leakage, needs urgent work by plumber.',
             imageUrl: 'https://via.placeholder.com/150',
             actions: [
               ElevatedButton(
@@ -68,7 +80,8 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
             status: 'Resolved',
             ticketNo: '#207',
             category: 'Electrical',
-            description: 'Switch board near the kitchen not working from the last 2 days.',
+            description:
+                'Switch board near the kitchen not working from the last 2 days.',
             imageUrl: 'https://via.placeholder.com/150',
             resolvedBy: 'Ghoreesh Rana',
             resolvedDate: '25 Feb, 3:45 PM',
@@ -184,7 +197,7 @@ class ComplaintCard extends StatelessWidget {
               Row(
                 children: List.generate(
                   5,
-                      (index) => Icon(
+                  (index) => Icon(
                     index < rating ? Icons.star : Icons.star_border,
                     color: Colors.amber,
                   ),

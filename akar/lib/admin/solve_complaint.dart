@@ -1,4 +1,5 @@
 import 'package:akar/admin/set_status.dart';
+import 'package:akar/admin/view_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -151,6 +152,10 @@ class ComplaintDetailPage extends StatelessWidget {
                         Center(
                           child: ElevatedButton(
                             onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ImageCarousel(complaintId: complaintId)),
+                              );
                               // Add your onPressed action here
                             },
                             style: ElevatedButton.styleFrom(
