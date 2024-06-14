@@ -109,14 +109,14 @@ class _ComplaintsHomePageState extends State<ComplaintsHomePage> {
 
               var complaints = snapshot.data!.docs;
 
-              // Filter complaints based on the selected filter
+              // Filter complaints based on the selected filter and check for the 'status' field
               if (_selectedFilter == 'Pending') {
-                complaints = complaints.where((doc) => doc['status'] != 'Complaint Resolved').toList();
+                complaints = complaints.where((doc) => doc.data() != null && (doc.data() as Map<String, dynamic>).containsKey('status') && doc['status'] != 'Complaint Resolved').toList();
               } else if (_selectedFilter == 'Resolved') {
-                complaints = complaints.where((doc) => doc['status'] == 'Complaint Resolved').toList();
+                complaints = complaints.where((doc) => doc.data() != null && (doc.data() as Map<String, dynamic>).containsKey('status') && doc['status'] == 'Complaint Resolved').toList();
               }
 
-              var urgentComplaints = complaints.where((doc) => doc['natureOfComplaint'] == 'Urgent').toList();
+              var urgentComplaints = complaints.where((doc) => (doc.data() as Map<String, dynamic>)['natureOfComplaint'] == 'Urgent').toList();
               var urgentCount = urgentComplaints.length;
 
               return Column(
@@ -132,7 +132,7 @@ class _ComplaintsHomePageState extends State<ComplaintsHomePage> {
                     child: ListView.builder(
                       itemCount: complaints.length,
                       itemBuilder: (context, index) {
-                        var complaint = complaints[index];
+                        var complaint = complaints[index].data() as Map<String, dynamic>;
                         return ComplaintCard(
                           name: complaint['fullName'],
                           time: complaint['timestamp'].toDate().toString(),
@@ -141,7 +141,7 @@ class _ComplaintsHomePageState extends State<ComplaintsHomePage> {
                           streetName: complaint['streetName'],
                           wardNumber: complaint['wardNumber'],
                           urgency: complaint['natureOfComplaint'],
-                          status: complaint['status'],  // Include status
+                          status: complaint.containsKey('status') ? complaint['status'] : 'Unknown',  // Check for status
                         );
                       },
                     ),
