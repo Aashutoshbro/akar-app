@@ -134,13 +134,13 @@ class _ComplaintsHomePageState extends State<ComplaintsHomePage> {
                       itemBuilder: (context, index) {
                         var complaint = complaints[index].data() as Map<String, dynamic>;
                         return ComplaintCard(
-                          name: complaint['fullName'],
-                          time: complaint['timestamp'].toDate().toString(),
-                          complaintId: complaint['ticketNumber'],
-                          complaintText: complaint['complaintDetails'],
-                          streetName: complaint['streetName'],
-                          wardNumber: complaint['wardNumber'],
-                          urgency: complaint['natureOfComplaint'],
+                          name: complaint['fullName'] ?? 'Unknown',
+                          time: complaint['timestamp'] != null ? (complaint['timestamp'] as Timestamp).toDate().toString() : 'Unknown',
+                          complaintId: complaint['ticketNumber'] ?? 'Unknown',
+                          complaintText: complaint['complaintDetails'] ?? 'No details provided',
+                          streetName: complaint['streetName'] ?? 'Unknown',
+                          wardNumber: complaint['wardNumber'] ?? 'Unknown',
+                          urgency: complaint['natureOfComplaint'] ?? 'Unknown',
                           status: complaint.containsKey('status') ? complaint['status'] : 'Unknown',  // Check for status
                         );
                       },

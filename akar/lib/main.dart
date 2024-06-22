@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:akar/Screens/splash.dart';
 import 'package:akar/admin/admin_login.dart';
 import 'package:akar/userpages/controllerpage.dart';
+import 'package:akar/userpages/userProfile/Identification.dart';
+import 'package:akar/userpages/userProfile/profileDetails.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'Screens/home.dart';
 import 'Screens/login.dart';
@@ -38,6 +39,8 @@ class MyApp extends StatelessWidget {
         "/login": (context) => const SignInPage(),
         "/recover": (context) => const RecoverPage(),
         "/UserPages": (context) => const MyCont(),
+        '/profile-details': (context) => const ProfileDetailsPage(),
+        '/upload-gov-id': (context) => const UploadId(),
 
         "/home": (context) => const MyHome(),
 

@@ -1,3 +1,4 @@
+import 'package:akar/userpages/track_complaint.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -148,16 +149,17 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   child: Text("Complain History"),
+                )
+                ,
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TrackComplaintPage()),
+                    );
+                  },
+                  child: Text("Track Complaint"),
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => TrackComplaintPage()),
-                //     );
-                //   },
-                //   child: Text("Track Complaint"),
-                // ),
               ],
             ),
             SizedBox(height: 20),
