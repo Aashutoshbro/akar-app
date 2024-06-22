@@ -1,4 +1,5 @@
 import "package:akar/userpages/profilepage.dart";
+import "package:akar/userpages/userProfile/profileScreen.dart";
 import "package:flutter/material.dart";
 import "basePage.dart";
 // Import the BasePage widget
@@ -25,7 +26,8 @@ class _MyContState extends State<MyCont> {
     HomePage(onPageChanged: _onPageChanged,),
     RegisterComplaintForm(),
     NotificationsPage(),
-    UserProfile(),
+    //UserProfile(),
+    ProfileScreen(),
   ];
 
   void _onPageChanged(int index) {

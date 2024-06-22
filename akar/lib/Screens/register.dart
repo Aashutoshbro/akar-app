@@ -89,12 +89,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
     return null;
   }
-
   Future<void> signUp(String email, String password) async {
     if (formKey.currentState!.validate()) {
+      // Show loading indicator immediately
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Prevent dismissing by tapping outside
+        builder: (context) {
+          return Center(child: CircularProgressIndicator());
+        },
+      );
+
       try {
-        UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
+        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -102,29 +109,26 @@ class _RegistrationPageState extends State<RegistrationPage> {
         User? user = userCredential.user;
 
         if (user != null) {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Center(child: CircularProgressIndicator());
-            },
-          );
           await addUserDetails(
             user.uid,
             nameController.text.trim(),
             emailController.text.trim(),
             contactController.text.trim(),
           );
-          Fluttertoast.showToast(msg: "Registered Successfully");
+
+          // Close the loading indicator
           Navigator.of(context).pop();
 
+          Fluttertoast.showToast(msg: "Registered Successfully");
           Navigator.pushNamed(context, "/login");
         }
       } catch (e) {
+        // Close the loading indicator
+        Navigator.of(context).pop();
         Fluttertoast.showToast(msg: e.toString());
       }
     }
   }
-
   Future<void> addUserDetails(
       String uid, String name, String email, String contact) async {
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
@@ -132,7 +136,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       'name': name,
       'email': email,
       'contact': contact,
-      'Address':"Empty Address",
+      'verificationStatus': 'pending',
+      'isProfileCompleted': false,
+      'isGovIdUploaded': false,
+
     });
   }
 

@@ -15,14 +15,13 @@ class User {
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
-    var data = doc.data()
-        as Map<String, dynamic>; // Ensuring the data is treated as a Map
+    var data = doc.data() as Map<String, dynamic>;
+
     return User(
-      name: data['name'],
-      contact: data['contact'],
-      email: data['email'],
-      profileImageURL:
-          data.containsKey('profileImageURL') ? data['profileImageURL'] : null,
+      name: data['name'] is String ? data['name'] : '',
+      contact: data['contact'] is String ? data['contact'] : '',
+      email: data['email'] is String ? data['email'] : '',
+      profileImageURL: data.containsKey('profileImageURL') && data['profileImageURL'] is String ? data['profileImageURL'] : null,
     );
   }
 }
@@ -45,12 +44,8 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   void _fetchUsers() async {
-    FirebaseFirestore.instance
-        .collection('users')
-        .snapshots()
-        .listen((snapshot) {
-      List<User> users =
-          snapshot.docs.map((doc) => User.fromDocument(doc)).toList();
+    FirebaseFirestore.instance.collection('users').snapshots().listen((snapshot) {
+      List<User> users = snapshot.docs.map((doc) => User.fromDocument(doc)).toList();
       setState(() {
         _allUsers = users;
         _filteredUsers = users;
@@ -59,14 +54,13 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   void _filterUsers() {
-    String query = _searchController.text.toLowerCase();
+    String query = _searchController.text.toLowerCase().trim();
     setState(() {
-      _filteredUsers = _allUsers
-          .where((user) =>
-              user.name.toLowerCase().contains(query) ||
-              user.contact.toLowerCase().contains(query) ||
-              user.email.toLowerCase().contains(query))
-          .toList();
+      _filteredUsers = _allUsers.where((user) {
+        return user.name.toLowerCase().startsWith(query) ||
+            user.contact.toLowerCase().contains(query) ||
+            user.email.toLowerCase().contains(query);
+      }).toList();
     });
   }
 
@@ -82,13 +76,13 @@ class _UsersPageState extends State<UsersPage> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: Colors.white, // Set the back icon color to white
+          color: Colors.white,
         ),
         backgroundColor: Colors.deepPurple,
         title: Text(
           'Users',
           style: TextStyle(
-            color: Colors.white, // Adjust text color for contrast
+            color: Colors.white,
           ),
         ),
       ),
@@ -137,13 +131,13 @@ class UserCard extends StatelessWidget {
       child: ListTile(
         leading: user.profileImageURL != null
             ? CircleAvatar(
-                backgroundImage: NetworkImage(user.profileImageURL!),
-                radius: 25,
-              )
+          backgroundImage: NetworkImage(user.profileImageURL!),
+          radius: 25,
+        )
             : CircleAvatar(
-                child: Icon(Icons.person),
-                radius: 25,
-              ),
+          child: Icon(Icons.person),
+          radius: 25,
+        ),
         title: Text(user.name),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
