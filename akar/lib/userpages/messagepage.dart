@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:latlong2/latlong.dart';
-
+import 'package:shimmer/shimmer.dart';
 
 import '../Screens/mapscreen.dart';
 
@@ -25,37 +25,53 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
   final ImagePicker _picker = ImagePicker();
   List<XFile>? _selectedImages = [];
   bool _isSubmitting = false;
-  //String _fullName = '';
-
-
+  bool _isLoading = true;
 
   // Controllers for form fields
   final TextEditingController _complaintDetailsController =
-      TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController  addressController = TextEditingController();
+  TextEditingController();
+
+  final TextEditingController addressController = TextEditingController();
 
   // Variables to store selected values
   String? _category;
   String? _complaintType;
-  String? _roadType;
+  String? _customCategory;
+  String? _customIssueType;
   String? _natureOfComplaint;
   String _landmark = '';
   String _streetName = '';
-  String _wardNumber = '';
-  String? _duration;
 
+  //String _wardNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
 
   @override
   void dispose() {
     _complaintDetailsController.dispose();
-    _phoneNumberController.dispose();
     addressController.dispose();
     super.dispose();
   }
 
-  Future<List<String>> _uploadImages(
-      List<XFile> images, String complaintId) async {
+  Future<void> _loadInitialData() async {
+    // Perform any initial data loading here
+    // For example, you might want to check if the user has already uploaded an ID
+
+    // Simulate a delay for demonstration purposes
+    await Future.delayed(Duration(seconds: 1));
+
+    // When done, set _isLoading to false
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<List<String>> _uploadImages(List<XFile> images,
+      String complaintId) async {
     List<String> downloadUrls = [];
     for (var image in images) {
       final storageRef = FirebaseStorage.instance
@@ -83,7 +99,7 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
 
     try {
       final List<XFile>? images =
-          await _picker.pickMultiImage(imageQuality: 50);
+      await _picker.pickMultiImage(imageQuality: 50);
 
       if (images != null) {
         if (_selectedImages!.length + images.length <= 3) {
@@ -165,36 +181,46 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
-          backgroundColor: Colors.green[50],
-          title: Column(
-            children: [
-              Icon(
-                Icons.check_circle,
-                color: Colors.green[800],
-                size: 80,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Success!',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                  fontFamily: 'Roboto',
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0,
+                  offset: const Offset(0.0, 10.0),
                 ),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
+              ],
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
+              children: <Widget>[
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green[800],
+                  size: 80,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Success!',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[800],
+                    fontFamily: 'Roboto',
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
                   'Your complaint has been submitted successfully!',
                   style: TextStyle(
                     fontSize: 18,
@@ -203,18 +229,18 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Text(
                   'Complaint ID: $complaintId',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Roboto',
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Text(
+                SizedBox(height: 10),
+                Text(
                   'Please keep this ID for future reference.',
                   style: TextStyle(
                     fontSize: 14,
@@ -222,20 +248,15 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
                     height: 1.5,
                   ),
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            Center(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                SizedBox(height: 24),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   ),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Text(
                     'OK',
                     style: TextStyle(
@@ -244,18 +265,19 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
                       fontFamily: 'Roboto',
                     ),
                   ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Optionally, navigate to a new screen or refresh the current one
+                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                  },
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
   }
-
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
@@ -267,25 +289,26 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
       // Check verification status
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
-        final doc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
         final status = doc.data()?['verificationStatus'] ?? 'pending';
         if (status != 'verified') {
-          String message = 'Please complete your profile and become a verified user to submit your complaint. This helps us better assist you.';
+          String message =
+              'Please complete your profile and become a verified user to submit your complaint. This helps us better assist you.';
           showDialog(
             context: context,
             builder: (context) => OopsScreen(message: message),
-
           );
           setState(() {
             _isSubmitting = false; // Hide progress indicator
             _formKey.currentState!.reset();
             _selectedImages!.clear();
             _complaintDetailsController.clear();
-            _phoneNumberController.clear();
+            addressController.clear();
             _category = null;
             _complaintType = null;
-            _roadType = null;
-            addressController.clear();
             _natureOfComplaint = null;
             location = null;
             address = null;
@@ -294,36 +317,36 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
         }
       }
 
-
-
-
       try {
         // Create a new complaint document in Firestore
         final complaintRef =
-            FirebaseFirestore.instance.collection('complaints').doc();
+        FirebaseFirestore.instance.collection('complaints').doc();
         final complaintId = complaintRef.id;
-
-
 
         // Upload images to Firebase Storage and get their URLs
         List<String> imageUrls = [];
-        if (_selectedImages!.isNotEmpty ) {
+        if (_selectedImages!.isNotEmpty) {
           imageUrls = await _uploadImages(_selectedImages!, complaintId);
         }
 
+        final String finalCategory = _category == 'Other' ? _customCategory ??
+            'Other' : _category ?? 'Unknown';
+        final String finalComplaintType = _category == 'Other' ||
+            _complaintType == 'Other'
+            ? _customIssueType ?? 'Other'
+            : _complaintType ?? 'Unknown';
+
         // Save the complaint data in Firestore
         await complaintRef.set({
+          'userID': currentUser?.uid,
           'ticketNumber': complaintRef.id,
-          'category': _category,
-          'complaintType': _complaintType,
-          'roadType': _roadType,
+          'category': finalCategory,
+          'complaintType': finalComplaintType,
           'natureOfComplaint': _natureOfComplaint,
-          'phoneNumber': _phoneNumberController.text,
-          //'area': addressController.text,
-          'duration':_duration,
-          'landmark':_landmark,
-          'streetName':_streetName,
-          'wardNumber':_wardNumber,
+          'area': addressController.text,
+          'landmark': _landmark,
+          'streetName': _streetName,
+          //'wardNumber': _wardNumber,
           'complaintDetails': _complaintDetailsController.text,
           'location': location != null
               ? GeoPoint(location!.latitude, location!.longitude)
@@ -331,7 +354,6 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
           'address': address,
           'timestamp': FieldValue.serverTimestamp(),
           'images': imageUrls,
-
         });
 
         // Show a success message
@@ -342,15 +364,12 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
         setState(() {
           _selectedImages!.clear();
           _complaintDetailsController.clear();
-          _phoneNumberController.clear();
+          addressController.clear();
           _category = null;
           _complaintType = null;
-          _roadType = null;
-          addressController.clear();
           _natureOfComplaint = null;
           location = null;
           address = null;
-
         });
       } catch (e) {
         // Handle any errors
@@ -370,458 +389,526 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double formWidth = screenWidth > 600 ? 600 : screenWidth * 0.9;
     return Scaffold(
-      body:Stack(
-        children:[ Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+      body: Stack(
+        children: [
+          Center(
             child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    const SizedBox(height: 4),
-                    // TextFormField(
-                    //   decoration: InputDecoration(labelText: 'Full Name',border: OutlineInputBorder(
-                    //     borderRadius: BorderRadius.circular(10),
-                    //   ),),
-                    //   validator: (value) => value!.isEmpty ? 'Required' : null,
-                    //   onSaved: (value) => _fullName = value!,
-                    // ),
-                    //
-                    // const SizedBox(height:18),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Problem Category',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      items: <String>[
-                        'Roads',
-                        'Side Walks',
-                        'Bridges',
-                        'Traffic Signals',
-                        'Street Lights',
-                        'Public Transport Stops',
-
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _category = value;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 17),
-                    DropdownButtonFormField<String>(
-                      validator: validateComplaintType,
-                      decoration: InputDecoration(
-                        labelText: 'Issue Type',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      items: <String>[
-                        'Potholes',
-                        'Cracked/Damaged Pavement',
-                        'Flooding/Drainage Issues',
-                        'Signage/Lighting Issues',
-                        'Debris/Obstructions',
-                        'Traffic Disruption',
-                        'Public Transport Issue',
-                        'Fallen Trees',
-                        'Damaged Bus/Taxi Stand',
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _complaintType = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 17,),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Duration of Issue',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      items: <String>[
-                        'Just Noticed',
-                        'Few Days',
-                        'Few Weeks',
-                        'More than a Month',
-                        'Unsure',
-
-
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _duration = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 17),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Select Road Type',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      items: <String>[
-                        'National Highway',
-                        'State Road',
-                        'Rural Road',
-                        'City Street',
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _roadType = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 17),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Nature of Complaint',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      items: <String>[
-
-                        'High (Major disruption, safety risk)',
-                        'Medium (Significant inconvenience)',
-                        'Low (General maintenance request)',
-
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _natureOfComplaint = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 17),
-                    TextFormField(
-                      controller: _phoneNumberController,
-                      validator: validateMobileNumber,
-                      decoration: InputDecoration(
-                        labelText: 'Contact Number',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      keyboardType: TextInputType.phone,
-                    ),
-                    // SizedBox(height: 17),
-                    //
-                    // TextFormField(
-                    //   controller: addressController,
-                    //   decoration:  InputDecoration(
-                    //     labelText:  'Affected Area',
-                    //     hintText: 'Municipality-Ward, District',
-                    //     border: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(10),
-                    //     ),
-                    //
-                    //   ),
-                    //   validator: (value) {
-                    //     if (value == null || value.isEmpty) {
-                    //       return 'Please enter affected site';
-                    //     }
-                    //     return null;
-                    //   },
-                    // ),
-
-                    SizedBox(height: 17),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Landmark',
-                        hintText: 'e.g. near Utech Clz',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),// Add this line for hint text
-                      ),
-                      onSaved: (value) => _landmark = value!,
-                    ),
-                    SizedBox(height: 20),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Street Name',
-                        hintText: 'e.g. Bishal Chowk',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),// Add this line for hint text
-                      ),
-                      onSaved: (value) => _streetName = value!,
-                    ),
-                    SizedBox(height: 20),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Ward Number',
-                        hintText: 'e.g. 11',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),// Add this line for hint text
-                      ),
-                      onSaved: (value) => _wardNumber = value!,
-                    ),
-                    const SizedBox(height: 20),
-
-                    TextFormField(
-                      controller: _complaintDetailsController,
-                      decoration: InputDecoration(
-                        labelText: 'Complaint Details',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      maxLines: 3,
-                    ),
-
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                ListTile(
-                                  leading: const Icon(Icons.camera_alt),
-                                  title: const Text('Take a photo'),
-                                  onTap: () async {
-                                    Navigator.pop(context);
-                                    final XFile? photo = await _picker.pickImage(
-                                      source: ImageSource.camera,
-                                    );
-                                    if (photo != null) {
-                                      setState(() {
-                                        if (_selectedImages!.length < 3) {
-                                          _selectedImages!.add(photo);
-                                        } else {
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    'You can only select up to 3 images.'),
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      });
-                                    }
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.photo),
-                                  title: const Text('Choose from gallery'),
-                                  onTap: () async {
-                                    Navigator.pop(context);
-                                    await _pickImage(ImageSource.gallery);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightBlue.shade800,
-                        minimumSize: const Size(160, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      icon: const Icon(Icons.photo, color: Colors.white),
-                      label: const Text(
-                        'Choose File',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 17),
-                    if (_selectedImages!.isNotEmpty)
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: _selectedImages!.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Stack(
-                            children: [
-                              Image.file(
-                                File(_selectedImages![index].path),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              ),
-                              Positioned(
-                                top: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedImages!.removeAt(index);
-                                    });
-                                  },
-                                  child: Container(
-                                    color: Colors.redAccent,
-                                    child: const Icon(
-                                      Icons.cancel,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+              child: Padding(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: formWidth),
+                  child: _isLoading
+                      ? const ShimmerLoading()
+                      : Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        const SizedBox(height: 4),
+                        _buildProblemCategoryField(),
+                        const SizedBox(height: 17),
+                        _buildIssueTypeField(),
+                        if (_category != 'Other' && _complaintType == 'Other')
+                          Padding(
+                            padding: const EdgeInsets.only(top: 17.0),
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'Specify Other Issue Type',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                            ],
-                          );
-                        },
-                      ),
-                    const SizedBox(height: 17),
-                    ElevatedButton.icon(
-                      onPressed: _selectLocation,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey,
-                        minimumSize: const Size(160, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      icon: const Icon(Icons.location_on_outlined,
-                          color: Colors.white),
-                      label: Text(
-                        location == null ? 'Select Location' : 'Change Location',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    if (location != null)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Latitude: ${location!.latitude}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
+                              onChanged: (value) {
+                                setState(() {
+                                  _customIssueType = value;
+                                });
+                              },
                             ),
                           ),
-                          SizedBox(
-                              height:4,),
-
-                          Text(
-                            'Longitude: ${location!.longitude}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          if (address != null)
-                            Text(
-                              'Address: $address',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                        ],
-                      ),
-                    const SizedBox(height: 20.0),
-                    Center(
-                      child: SizedBox(
-                        width: 120,
-                        height: 49,
-                        child: ElevatedButton(
-                          onPressed: _isSubmitting ? null : _submitForm,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _isSubmitting
-                                ? Colors.greenAccent
-                                : Colors.blueAccent,
-                            shape: RoundedRectangleBorder(
+                        const SizedBox(height: 17),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Nature of Complaint',
+                            border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: const Text(
-                            'Submit',
+                          items: <String>[
+                            'High (Major disruption, safety risk)',
+                            'Medium (Significant inconvenience)',
+                            'Low (General maintenance request)',
+                          ].map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _natureOfComplaint = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 17),
+                        TextFormField(
+                          controller: addressController,
+                          decoration: InputDecoration(
+                            labelText: 'Affected Area',
+                            hintText: 'Municipality-Ward, District',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter affected site';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 17),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Landmark',
+                            hintText: 'e.g. near Utech Clz',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onSaved: (value) => _landmark = value!,
+                        ),
+                        const SizedBox(height: 17),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Street Name',
+                            hintText: 'e.g. Bishal Chowk',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onSaved: (value) => _streetName = value!,
+                        ),
+
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _complaintDetailsController,
+                          decoration: InputDecoration(
+                            labelText: 'Complaint Details',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          maxLines: 3,
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading:
+                                      const Icon(Icons.camera_alt),
+                                      title: const Text('Take a photo'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        final XFile? photo =
+                                        await _picker.pickImage(
+                                          source: ImageSource.camera,
+                                        );
+                                        if (photo != null) {
+                                          setState(() {
+                                            if (_selectedImages!.length <
+                                                3) {
+                                              _selectedImages!.add(photo);
+                                            } else {
+                                              if (mounted) {
+                                                ScaffoldMessenger.of(
+                                                    context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                        'You can only select up to 3 images.'),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          });
+                                        }
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.photo),
+                                      title: const Text(
+                                          'Choose from gallery'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        await _pickImage(
+                                            ImageSource.gallery);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlue.shade800,
+                            minimumSize: const Size(160, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          icon: const Icon(Icons.photo,
+                              color: Colors.white),
+                          label: const Text(
+                            'Choose File',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 17),
+                        if (_selectedImages!.isNotEmpty)
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: _selectedImages!.length,
+                            itemBuilder:
+                                (BuildContext context, int index) {
+                              return Stack(
+                                children: [
+                                  Image.file(
+                                    File(_selectedImages![index].path),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedImages!
+                                              .removeAt(index);
+                                        });
+                                      },
+                                      child: Container(
+                                        color: Colors.redAccent,
+                                        child: const Icon(
+                                          Icons.cancel,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        const SizedBox(height: 17),
+                        ElevatedButton.icon(
+                          onPressed: _selectLocation,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey,
+                            minimumSize: const Size(160, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          icon: const Icon(Icons.location_on_outlined,
+                              color: Colors.white),
+                          label: Text(
+                            location == null
+                                ? 'Select Location'
+                                : 'Change Location',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (location != null)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Latitude: ${location!.latitude}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Longitude: ${location!.longitude}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              if (address != null)
+                                Text(
+                                  'Address: $address',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        const SizedBox(height: 20.0),
+                        Center(
+                          child: SizedBox(
+                            width: 120,
+                            height: 49,
+                            child: ElevatedButton(
+                              onPressed:
+                              _isSubmitting ? null : _submitForm,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isSubmitting
+                                    ? Colors.greenAccent
+                                    : Colors.blueAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Submit',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
           if (_isSubmitting)
             Container(
               color: Colors.black54,
-              child: Center(
+              child: const Center(
                 child: CircularProgressIndicator(
                   color: Colors.deepPurple,
                 ),
               ),
             ),
-    ],
-
+        ],
       ),
     );
   }
-}
+  Widget _buildProblemCategoryField() {
+    return Column(
+      children: [
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: 'Problem Category',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          value: _category,
+          items: <String>[
+            'Roads and Traffic',
+            'Sidewalks and Pedestrian Areas',
+            'Public Transportation',
+            'Parks and Public Spaces',
+            'Utilities and Infrastructure',
+            'Waste Management',
+            'Other',
+          ].toSet().map((String value) { // Ensure uniqueness with .toSet()
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _category = value;
+              _complaintType = null;
+              _customCategory = null;
+              _customIssueType = null;
+            });
+          },
+        ),
+        if (_category == 'Other')
+          Padding(
+            padding: const EdgeInsets.only(top: 17.0),
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Specify Other Category',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _customCategory = value;
+                });
+              },
+            ),
+          ),
+      ],
+    );
+  }
 
+  Widget _buildIssueTypeField() {
+    if (_category == 'Other') {
+      return TextFormField(
+        decoration: InputDecoration(
+          labelText: 'Specify Issue Type',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _customIssueType = value;
+          });
+        },
+      );
+    }
+
+    List<String> issueTypes = _getIssueTypesForCategory(_category).toSet().toList(); // Ensure uniqueness
+
+    return Column(
+      children: [
+        DropdownButtonFormField<String>(
+          validator: validateComplaintType,
+          decoration: InputDecoration(
+            labelText: 'Issue Type',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          value: _complaintType,
+          items: issueTypes.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value, overflow: TextOverflow.ellipsis),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _complaintType = value;
+              if (value == 'Other') {
+                _customIssueType = null;
+              }
+            });
+          },
+        ),
+        // if (_complaintType == 'Other')
+        //   Padding(
+        //     padding: const EdgeInsets.only(top: 17.0),
+        //     child: TextFormField(
+        //       decoration: InputDecoration(
+        //         labelText: 'Specify Other Issue Type',
+        //         border: OutlineInputBorder(
+        //           borderRadius: BorderRadius.circular(10),
+        //         ),
+        //       ),
+        //       onChanged: (value) {
+        //         setState(() {
+        //           _customIssueType = value;
+        //         });
+        //       },
+        //     ),
+        //   ),
+      ],
+    );
+  }
+
+  List<String> _getIssueTypesForCategory(String? category) {
+    switch (category) {
+      case 'Roads and Traffic':
+        return [
+          'Potholes',
+          'Road damage',
+          'Traffic light malfunction',
+          'Street sign issues',
+          'Road markings faded',
+          'Flooding on road',
+          'Illegal parking',
+          'Other',
+        ];
+      case 'Sidewalks and Pedestrian Areas':
+        return [
+          'Broken sidewalk',
+          'Obstructed walkway',
+          'Poor lighting',
+          'Other',
+        ];
+      case 'Public Transportation':
+        return [
+          'Bus stop damage',
+          'Cleanliness issues',
+          'Other',
+        ];
+      case 'Parks and Public Spaces':
+        return [
+          'Damaged playground equipment',
+          'Overgrown vegetation',
+          'Vandalism',
+          'Lack of lighting',
+          'Litter or trash',
+          'Other',
+        ];
+      case 'Utilities and Infrastructure':
+        return [
+          'Street light out',
+          'Water leak',
+          'Sewer(wastewater) overflow',
+          'Damaged drain cover',
+          'Fallen power lines',
+          'Fallen Trees',
+          'Other',
+        ];
+      case 'Waste Management':
+        return [
+          'Missed garbage collection',
+          'Overflowing public trash bin',
+          'Illegal dumping',
+          'Recycling issues',
+          'Other',
+        ];
+
+      case 'Other':
+        return ['Please specify'];
+      default:
+        return ['Other'];
+    }
+  }
+}
 
 class OopsScreen extends StatelessWidget {
   final String message;
@@ -861,17 +948,53 @@ class OopsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-
                 },
                 child: Text(
                   'TRY AGAIN',
                   style: TextStyle(fontWeight: FontWeight.bold),
-
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ShimmerLoading extends StatelessWidget {
+  const ShimmerLoading({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          for (int i = 0; i < 8; i++) ...[
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 5.0),
+              height: 65.0,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+            const SizedBox(height: 4.0),
+          ],
+          for (int i = 0; i < 2; i++) ...[
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              height: 48.0,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

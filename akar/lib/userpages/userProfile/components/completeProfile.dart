@@ -140,18 +140,25 @@ class _CprofileState extends State<Cprofile> {
                     children: [
                       Container(
                         width: double.infinity,
-                        height: 30.0,
+                        height: 40.0,
                         color: Colors.white,
                       ),
                       const SizedBox(height: 20),
                       Container(
                         width: double.infinity,
-                        height: 7.0,
+                        height: 9.0,
                         color: Colors.white,
                       ),
+
                       const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        height: 9.0,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 40),
                       SizedBox(
-                        height: 180, // Constrain the height of the ListView
+                        height: 190, // Constrain the height of the ListView
                         child: ListView.separated(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
@@ -167,7 +174,7 @@ class _CprofileState extends State<Cprofile> {
                             );
                           },
                           separatorBuilder: (context, index) =>
-                              const Padding(padding: EdgeInsets.only(right: 4)),
+                          const Padding(padding: EdgeInsets.only(right: 4)),
                           itemCount: 2,
                         ),
                       ),
@@ -215,9 +222,7 @@ class _CprofileState extends State<Cprofile> {
                       style: TextStyle(color: Colors.green[800]),
                     ),
                   ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     const Padding(
@@ -230,136 +235,137 @@ class _CprofileState extends State<Cprofile> {
                     Text(
                       isProfileDetailsCompleted && isGovIdUploaded
                           ? verificationStatus == VerificationStatus.verified
-                              ? "Verified"
-                              : verificationStatus ==
-                                      VerificationStatus.unverified
-                                  ? "Unverified"
-                                  : "Validation in progress"
+                          ? "Verified"
+                          : verificationStatus == VerificationStatus.unverified
+                          ? "Unverified"
+                          : "Validation in progress"
                           : "(${(isProfileDetailsCompleted ? 1 : 0) + (isGovIdUploaded ? 1 : 0)}/2)",
                       style: TextStyle(
                         color: verificationStatus == VerificationStatus.verified
                             ? Colors.green
-                            : verificationStatus ==
-                                    VerificationStatus.unverified
-                                ? Colors.red
-                                : Colors.lightBlue,
+                            : verificationStatus == VerificationStatus.unverified
+                            ? Colors.red
+                            : Colors.lightBlue,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  children: List.generate(2, (index) {
-                    return Expanded(
-                      child: Container(
-                        height: 7,
-                        margin: EdgeInsets.only(right: index == 1 ? 2 : 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: (index == 0 && isProfileDetailsCompleted) ||
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    double itemWidth = constraints.maxWidth * 0.4; // 40% of the screen width
+
+                    return Row(
+                      children: List.generate(2, (index) {
+                        return Expanded(
+                          child: Container(
+                            height: 7,
+                            margin: EdgeInsets.only(right: index == 1 ? 2 : 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: (index == 0 && isProfileDetailsCompleted) ||
                                   (index == 1 && isGovIdUploaded)
-                              ? Colors.lightBlue
-                              : Colors.grey,
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 180, // Constrain the height of the ListView
-                  child: ListView.separated(
-                    physics: const BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      final card = pc[index];
-                      return SizedBox(
-                        width: 160,
-                        child: Card(
-                          shadowColor: Colors.black87,
-                          child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  card.icon,
-                                  size: 30,
-                                ),
-                                const SizedBox(height: 18),
-                                Text(
-                                  card.title,
-                                  textAlign: TextAlign.center,
-                                ),
-                                const Spacer(),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    switch (index) {
-                                      case 0:
-                                        if (!isProfileDetailsCompleted ||
-                                            verificationStatus ==
-                                                VerificationStatus.unverified) {
-                                          navigateToProfileDetails();
-                                        }
-                                        break;
-                                      case 1:
-                                        if (!isGovIdUploaded ||
-                                            verificationStatus ==
-                                                VerificationStatus.unverified) {
-                                          navigateToUploadGovId();
-                                        }
-                                        break;
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: (index == 0 &&
-                                                isProfileDetailsCompleted &&
-                                                verificationStatus ==
-                                                    VerificationStatus
-                                                        .verified) ||
-                                            (index == 1 &&
-                                                isGovIdUploaded &&
-                                                verificationStatus ==
-                                                    VerificationStatus.verified)
-                                        ? Colors.grey
-                                        : verificationStatus ==
-                                                VerificationStatus.unverified
-                                            ? Colors.red
-                                            : Colors.lightBlue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: Text((index == 0 &&
-                                              isProfileDetailsCompleted &&
-                                              verificationStatus ==
-                                                  VerificationStatus
-                                                      .verified) ||
-                                          (index == 1 &&
-                                              isGovIdUploaded &&
-                                              verificationStatus ==
-                                                  VerificationStatus.verified)
-                                      ? "Verified"
-                                      : verificationStatus ==
-                                              VerificationStatus.unverified
-                                          ? "Reset"
-                                          : isGovIdUploaded &&
-                                                  verificationStatus ==
-                                                      VerificationStatus
-                                                          .pending &&
-                                                  index == 1
-                                              ? "Processing"
-                                              : card.buttonText),
-                                ),
-                              ],
+                                  ? Colors.lightBlue
+                                  : Colors.grey,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const Padding(padding: EdgeInsets.only(right: 4)),
-                    itemCount: pc.length,
-                  ),
+                        );
+                      }),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    double itemWidth = constraints.maxWidth * 0.50; // 50% of the screen width
+                    double buttonWidth = itemWidth - 30; // reduce padding for the button width
+
+                    return SizedBox(
+                      height: 190, // Constrain the height of the ListView
+                      child: ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final card = pc[index];
+                          return Container(
+                            width: itemWidth,
+                            child: Card(
+                              shadowColor: Colors.black87,
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      card.icon,
+                                      size: 30,
+                                    ),
+                                    const SizedBox(height: 18),
+                                    Text(
+                                      card.title,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const Spacer(),
+                                    FittedBox(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          switch (index) {
+                                            case 0:
+                                              if (!isProfileDetailsCompleted ||
+                                                  verificationStatus == VerificationStatus.unverified) {
+                                                navigateToProfileDetails();
+                                              }
+                                              break;
+                                            case 1:
+                                              if (!isGovIdUploaded ||
+                                                  verificationStatus == VerificationStatus.unverified) {
+                                                navigateToUploadGovId();
+                                              }
+                                              break;
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: (index == 0 &&
+                                              isProfileDetailsCompleted &&
+                                              verificationStatus == VerificationStatus.verified) ||
+                                              (index == 1 &&
+                                                  isGovIdUploaded &&
+                                                  verificationStatus == VerificationStatus.verified)
+                                              ? Colors.grey
+                                              : verificationStatus == VerificationStatus.unverified
+                                              ? Colors.red
+                                              : Colors.lightBlue,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          minimumSize: Size(buttonWidth, 36), // Set button width dynamically
+                                        ),
+                                        child: Text((index == 0 &&
+                                            isProfileDetailsCompleted &&
+                                            verificationStatus == VerificationStatus.verified) ||
+                                            (index == 1 &&
+                                                isGovIdUploaded &&
+                                                verificationStatus == VerificationStatus.verified)
+                                            ? "Verified"
+                                            : verificationStatus == VerificationStatus.unverified
+                                            ? "Reset"
+                                            : isGovIdUploaded &&
+                                            verificationStatus == VerificationStatus.pending &&
+                                            index == 1
+                                            ? "Processing"
+                                            : card.buttonText),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) => const Padding(padding: EdgeInsets.only(right: 4)),
+                        itemCount: pc.length,
+                      ),
+                    );
+                  },
                 ),
               ]
             ],

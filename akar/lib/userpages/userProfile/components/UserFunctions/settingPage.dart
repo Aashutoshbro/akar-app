@@ -1,7 +1,12 @@
 import 'package:akar/userpages/userProfile/components/UserFunctions/perosnalDetails.dart';
 import 'package:akar/userpages/userProfile/components/UserFunctions/settings/changePasswordPage.dart';
+import 'package:akar/userpages/userProfile/components/UserFunctions/settings/privacyPolicy.dart';
+import 'package:akar/userpages/userProfile/components/UserFunctions/settings/termsService.dart';
 import 'package:flutter/material.dart';
-import 'package:akar/userpages/userProfile/components/UserFunctions/invite_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../Screens/home.dart';
+
 
 class UserSettingsPage extends StatelessWidget {
   @override
@@ -67,21 +72,28 @@ class UserSettingsPage extends StatelessWidget {
                 'Privacy Policy',
                 Icons.privacy_tip_outlined,
                     () {
-                  // Navigate to Privacy Policy page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
+                      );
                 },
               ),
               _buildListTile(
                 'Terms of Service',
                 Icons.description_outlined,
                     () {
-                  // Navigate to Terms of Service page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>TermsOfServiceScreen()),
+                      );
+
                 },
               ),
               _buildListTile(
                 'Log Out',
                 Icons.exit_to_app,
-                    () {
-                  // Handle log out
+                    () async {
+                      await signOut(context);
                 },
               ),
             ],
@@ -130,4 +142,14 @@ class UserSettingsPage extends StatelessWidget {
       onChanged: onChanged,
     );
   }
+}
+
+Future<void> signOut(BuildContext context) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('userId');
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (context) => MyHome()),
+        (Route<dynamic> route) => false,
+  );
 }

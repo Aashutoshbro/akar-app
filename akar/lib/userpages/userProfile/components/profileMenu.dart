@@ -15,7 +15,8 @@ class ProfileMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double horizontalPadding = screenWidth * 0.04; // 5% of screen width
+    double horizontalPadding = screenWidth * 0.04; // 4% of screen width
+    double iconTextSpacing = screenWidth * 0.05; // 5% of screen width
 
     return GestureDetector(
       onTap: press,
@@ -34,12 +35,16 @@ class ProfileMenu extends StatelessWidget {
               Row(
                 children: [
                   icon,
-                  const SizedBox(width: 20),
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16,
+                  SizedBox(width: iconTextSpacing), // Responsive spacing
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: screenWidth * 0.5),
+                    child: Text(
+                      text,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
