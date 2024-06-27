@@ -51,6 +51,7 @@ dependencies:
   shared_preferences: ^2.0.15
   image_picker: ^1.1.1
   permission_handler: ^11.3.1
+  http: ^0.13.6
   flutter_map: ^3.1.0
   latlong2: ^0.8.1
   geocoding: ^2.0.4
@@ -61,9 +62,12 @@ dependencies:
   google_nav_bar: ^5.0.6
   flutter_svg: ^1.1.6
   share: ^2.0.4
+  flutter_keyboard_visibility: ^5.4.1
   flutter_cache_manager: ^3.3.0
   cached_network_image: ^3.2.0
   flutter_emoji_feedback: ^0.1.2
+  url_launcher: ^6.0.20
+  flutter_typeahead: ^4.0.0
 
 
 

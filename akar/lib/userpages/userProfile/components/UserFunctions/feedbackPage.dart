@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_emoji_feedback/flutter_emoji_feedback.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // For user ID (if using Firebase Authentication)
+import 'package:share/share.dart';
 
-class FeedbackPage extends StatelessWidget {
+class FeedbackPage extends StatefulWidget {
+  @override
+  _FeedbackPageState createState() => _FeedbackPageState();
+}
+
+class _FeedbackPageState extends State<FeedbackPage> {
+  bool _isSubmitting = false;
+  int _selectedFeedback = -1;
+  TextEditingController _commentController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +33,6 @@ class FeedbackPage extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-
-
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -35,32 +45,26 @@ class FeedbackPage extends StatelessWidget {
                     children: [
                       Text(
                         'How satisfied are you with the overall experience of using the app?',
-
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-
                       SizedBox(height: 20),
-
-                      // Emoji feedback widget
                       EmojiFeedback(
                         onChanged: (value) {
-                          print('Selected feedback: $value');
+                          setState(() {
+                            _selectedFeedback = value;
+                          });
                         },
                       ),
-
                       SizedBox(height: 20),
-
-                      // Text field for additional comments
                       TextField(
+                        controller: _commentController,
                         decoration: InputDecoration(
                           labelText: 'What are the main reasons for your rating?',
                           border: OutlineInputBorder(),
                         ),
                         maxLines: 3,
                       ),
-
                       SizedBox(height: 20),
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -74,10 +78,16 @@ class FeedbackPage extends StatelessWidget {
                             child: Text('Cancel'),
                           ),
                           ElevatedButton(
-                            onPressed: () {
-                              // Submit feedback
-                            },
-                            child: Text('Submit'),
+                            onPressed: _isSubmitting ? null : _submitFeedback,
+                            child: _isSubmitting
+                                ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                                : Text('Submit'),
                           ),
                         ],
                       ),
@@ -90,5 +100,82 @@ class FeedbackPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _submitFeedback() async {
+    if (_selectedFeedback == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a rating before submitting.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('feedback').add({
+          'userId': user.uid,
+          'rating': _selectedFeedback,
+          'comments': _commentController.text,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        _showShareOptionsDialog();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User not logged in. Please log in to submit feedback.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit feedback. Please try again later.')),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  void _showShareOptionsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Thank you for your feedback!'),
+          content: Text('Would you like to share your experience?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('No, thanks'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Share'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _shareExperience();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _shareExperience() {
+    String feedbackText = 'Rating: $_selectedFeedback\nComments: ${_commentController.text}';
+    Share.share(feedbackText);
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 }

@@ -32,7 +32,6 @@ Future<void> signOut(BuildContext context) async {
 }
 
 class _BasePageState extends State<BasePage> {
-  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -125,9 +124,7 @@ class _BasePageState extends State<BasePage> {
             ],
           ),
         ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : widget.page,
+        body: widget.page,
         bottomNavigationBar: CurvedNavigationBar(
           backgroundColor: Colors.transparent,
           buttonBackgroundColor: Colors.deepPurple,
@@ -139,20 +136,7 @@ class _BasePageState extends State<BasePage> {
             Icon(Icons.notifications_on, color: Colors.white),
             Icon(Icons.person, color: Colors.white),
           ],
-          onTap: (index) async {
-            if (index == 1) { // Register Complaint page
-              setState(() {
-                _isLoading = true;
-              });
-
-              // Simulate a delay to load the form
-              await Future.delayed(Duration(seconds: 2));
-
-              setState(() {
-                _isLoading = false;
-              });
-            }
-
+          onTap: (index) {
             widget.onPageChanged(index);
           },
           index: widget.pageIndex,
