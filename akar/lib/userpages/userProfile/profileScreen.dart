@@ -1,5 +1,6 @@
 import 'package:akar/admin/settings_page.dart';
 import 'package:akar/userpages/userProfile/components/UserFunctions/feedbackPage.dart';
+import 'package:akar/userpages/userProfile/components/UserFunctions/helpSupport.dart';
 import 'package:akar/userpages/userProfile/components/UserFunctions/invite_page.dart';
 import 'package:akar/userpages/userProfile/components/UserFunctions/settingPage.dart';
 import 'package:flutter/material.dart';
@@ -152,7 +153,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: "Help & Support",
                     icon: const Icon(Icons.help_outline_outlined,
                         color: Colors.deepPurple),
-                    press: () {},
+                    press: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HelpAndSupportPage()),
+                      );
+
+                    },
                   ),
                 ],
               ),
