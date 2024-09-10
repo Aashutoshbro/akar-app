@@ -10,9 +10,11 @@ class HelpAndSupportPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Help & Support',style: TextStyle(color: Colors.white),),
+        title: Text('Help & Support', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView(
