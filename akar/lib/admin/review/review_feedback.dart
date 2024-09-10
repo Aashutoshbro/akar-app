@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'detailed_review.dart';
 
 class ReviewsPage extends StatelessWidget {
@@ -16,37 +18,31 @@ class ReviewsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: _buildStatCard('Reviews', '53', Icons.rate_review),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: _buildStatCard('Answered', '3', Icons.check_circle, countColor: Colors.green),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: _buildStatCard('Due', '50', Icons.schedule, countColor: Colors.red),
-                ),
-              ],
-            ),
             SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Filters',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+            FutureBuilder(
+              future: _getStats(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                final stats = snapshot.data as Map<String, int>;
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: _buildStatCard('Reviews', stats['total'].toString(), Icons.rate_review),
                     ),
-                  ),
-                ),
-              ],
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildStatCard('Answered', stats['answered'].toString(), Icons.check_circle, countColor: Colors.green),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildStatCard('Due', (stats['total']! - stats['answered']!).toString(), Icons.schedule, countColor: Colors.red),
+                    ),
+                  ],
+                );
+              },
             ),
             SizedBox(height: 10),
             Row(
@@ -60,10 +56,38 @@ class ReviewsPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Expanded(
-              child: ListView.builder(
-                itemCount: 1, // Replace with the actual number of reviews
-                itemBuilder: (context, index) {
-                  return _buildReviewCard(context);
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('feedback').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  final reviews = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: reviews.length,
+                    itemBuilder: (context, index) {
+                      final review = reviews[index];
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance.collection('users').doc(review['userId']).get(),
+                        builder: (context, userSnapshot) {
+                          if (!userSnapshot.hasData) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          final user = userSnapshot.data!;
+                          return _buildReviewCard(
+                            context,
+                            review['comments'],
+                            review['rating'],
+                            review['timestamp'],
+                            user['name'],
+                            user['homeAddress'],
+                            user['profileImageURL'],
+                            review.id,
+                          );
+                        },
+                      );
+                    },
+                  );
                 },
               ),
             ),
@@ -71,6 +95,19 @@ class ReviewsPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<Map<String, int>> _getStats() async {
+    final feedbackSnapshot = await FirebaseFirestore.instance.collection('feedback').get();
+    final answeredSnapshot = await FirebaseFirestore.instance.collection('feedback').where('answered', isEqualTo: true).get();
+
+    final totalReviews = feedbackSnapshot.docs.length;
+    final answeredReviews = answeredSnapshot.docs.length;
+
+    return {
+      'total': totalReviews,
+      'answered': answeredReviews,
+    };
   }
 
   Widget _buildStatCard(String title, String count, IconData icon, {Color countColor = Colors.black}) {
@@ -116,7 +153,16 @@ class ReviewsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewCard(BuildContext context) {
+  Widget _buildReviewCard(
+      BuildContext context,
+      String comment,
+      int rating,
+      Timestamp timestamp,
+      String name,
+      String homeAddress,
+      String profileImageURL,
+      String reviewId,
+      ) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -125,50 +171,58 @@ class ReviewsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Very disappointing',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _getRatingText(rating),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _showDeleteConfirmationDialog(context, reviewId),
+                ),
+              ],
             ),
             SizedBox(height: 10),
             Row(
-              children: [
-                Icon(Icons.star, color: Colors.orange, size: 20),
-                Icon(Icons.star_border, color: Colors.orange, size: 20),
-                Icon(Icons.star_border, color: Colors.orange, size: 20),
-                Icon(Icons.star_border, color: Colors.orange, size: 20),
-                Icon(Icons.star_border, color: Colors.orange, size: 20),
-              ],
+              children: List.generate(5, (index) {
+                return Icon(
+                  index < rating ? Icons.star : Icons.star_border,
+                  color: Colors.orange,
+                  size: 20,
+                );
+              }),
             ),
             SizedBox(height: 10),
             Row(
               children: [
                 Icon(Icons.access_time, size: 16),
                 SizedBox(width: 5),
-                Text('5 mins ago'),
+                Text(timestamp.toDate().toString()),
               ],
             ),
             SizedBox(height: 10),
             Text(
-              "This app is a prime example of how not to design for performance. It's evident that the developers didn't invest enough time and effort in optimizing it. It's sluggish, clunky, and prone...",
-              style: TextStyle(color: Colors.grey[600]),
+              comment,
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             SizedBox(height: 10),
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://via.placeholder.com/150'), // Replace with actual profile image URL
+                  backgroundImage: NetworkImage(profileImageURL),
                   radius: 20,
                 ),
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hom bdr. Pathak'),
-                    Text('Phalewas', style: TextStyle(color: Colors.grey)),
+                    Text(name),
+                    Text(homeAddress, style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ],
@@ -179,13 +233,13 @@ class ReviewsPage extends StatelessWidget {
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
-                    isScrollControlled: true,  // This ensures the modal adjusts for the keyboard
+                    isScrollControlled: true,
                     builder: (context) => SingleChildScrollView(
                       child: Padding(
                         padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom,  // Adjust padding for keyboard
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
                         ),
-                        child: ReviewDetailsModal(),
+                        child: ReviewDetailsModal(userId: '',),
                       ),
                     ),
                   );
@@ -205,5 +259,50 @@ class ReviewsPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, String reviewId) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Review'),
+          content: Text('Are you sure you want to delete this review?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Yes', style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                await FirebaseFirestore.instance.collection('feedback').doc(reviewId).delete();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _getRatingText(int rating) {
+    switch (rating) {
+      case 1:
+        return 'Poor experience';
+      case 2:
+        return 'Mediocre experience';
+      case 3:
+        return 'Neutral experience';
+      case 4:
+        return 'Excellent experience';
+      case 5:
+        return 'Outstanding experience';
+      default:
+        return '';
+    }
   }
 }

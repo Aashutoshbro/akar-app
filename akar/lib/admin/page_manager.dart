@@ -3,6 +3,7 @@ import 'package:akar/userpages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
+import '../userpages/basePage.dart';
 import 'home_page.dart';
 import 'search_page.dart';
 import 'settings_page.dart';
@@ -79,6 +80,17 @@ class _PageManagerState extends State<PageManager> {
                 onTap: () {
                   _onItemTapped(2);
                   Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text(
+                  "Logout",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                ),
+                onTap: () async {
+                  Navigator.pop(context); // Close the drawer
+                  await signOut(context);
                 },
               ),
             ],
