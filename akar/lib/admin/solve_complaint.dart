@@ -38,9 +38,9 @@ class ComplaintDetailPage extends StatelessWidget {
           }
 
           var complaintData = snapshot.data!;
-          var name = complaintData['fullName'];
-          var phoneNumber = complaintData['phoneNumber'];
-          var citizenshipNumber = complaintData['citizenshipNumber'];
+          var name = complaintData['userID'];
+          //var phoneNumber = complaintData['phoneNumber'];
+          //var citizenshipNumber = complaintData['citizenshipNumber'];
           var ticketNumber = complaintData['ticketNumber'];
           var complaintDetails = complaintData['complaintDetails'];
           var complaintType = complaintData['complaintType'];
@@ -51,7 +51,7 @@ class ComplaintDetailPage extends StatelessWidget {
           var landmark = complaintData['landmark'];
           var location = complaintData['location'];
           var streetName = complaintData['streetName'];
-          var wardNumber = complaintData['wardNumber'];
+          //var wardNumber = complaintData['wardNumber'];
 
           return SingleChildScrollView(
             child: Padding(
@@ -74,14 +74,14 @@ class ComplaintDetailPage extends StatelessWidget {
                               name,
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              'Contact: $phoneNumber',
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                            Text(
-                              'Cid: $citizenshipNumber',
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
+                            // Text(
+                            //   'Contact: $phoneNumber',
+                            //   style: TextStyle(color: Colors.grey[600]),
+                            // ),
+                            // Text(
+                            //   'Cid: $citizenshipNumber',
+                            //   style: TextStyle(color: Colors.grey[600]),
+                            // ),
                             Text(
                               'Ticket: $ticketNumber',
                               style: TextStyle(color: Colors.grey[600]),
@@ -209,13 +209,13 @@ class ComplaintDetailPage extends StatelessWidget {
                             SizedBox(height: 5),
                             Text('$streetName', style: TextStyle(fontSize: 16)),
                             SizedBox(height: 10),
-                            Text(
-                              'Ward Number:',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
+                            // Text(
+                            //   'Ward Number:',
+                            //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            // ),
                             SizedBox(height: 5),
-                            Text('$wardNumber', style: TextStyle(fontSize: 16)),
-                            SizedBox(height: 10),
+                            // Text('$wardNumber', style: TextStyle(fontSize: 16)),
+                            // SizedBox(height: 10),
                           ],
                         ),
                         Center(

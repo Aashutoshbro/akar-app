@@ -1,10 +1,12 @@
-import 'package:akar/userpages/track_complaint.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:akar/userpages/track_complaint.dart';
 
 class ComplaintHistory extends StatefulWidget {
   final Function(int) onPageChanged;
+  final String userID;
 
-  const ComplaintHistory({Key? key, required this.onPageChanged})
+  const ComplaintHistory({Key? key, required this.onPageChanged, required this.userID})
       : super(key: key);
 
   @override
@@ -12,105 +14,94 @@ class ComplaintHistory extends StatefulWidget {
 }
 
 class _ComplaintHistoryState extends State<ComplaintHistory> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    print("Received userID: ${widget.userID}");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Complaint History',
-          style: TextStyle(
-            color: Colors.white, // Adjust text color for contrast
-          ),
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor:
-            Colors.deepPurple, // Dark purple background for the entire app bar
+        backgroundColor: Colors.deepPurple,
       ),
-      body: ListView(
-        children: [
-          ComplaintCard(
-            status: 'In Progress',
-            ticketNo: '#214',
-            category: 'Plumbing',
-            description:
-                'Water tap and sink pipe leakage, needs urgent work by plumber.',
-            imageUrl: 'https://via.placeholder.com/150',
-            actions: [
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('WITHDRAW'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TrackComplaintPage()),
-                  );
-                },
-                child: Text('TRACK'),
-              ),
-            ],
-          ),
-          ComplaintCard(
-            status: 'In Progress',
-            ticketNo: '#214',
-            category: 'Plumbing',
-            description:
-                'Water tap and sink pipe leakage, needs urgent work by plumber.',
-            imageUrl: 'https://via.placeholder.com/150',
-            actions: [
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('WITHDRAW'),
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('TRACK'),
-              ),
-            ],
-          ),
-          ComplaintCard(
-            status: 'Resolved',
-            ticketNo: '#207',
-            category: 'Electrical',
-            description:
-                'Switch board near the kitchen not working from the last 2 days.',
-            imageUrl: 'https://via.placeholder.com/150',
-            resolvedBy: 'Ghoreesh Rana',
-            resolvedDate: '25 Feb, 3:45 PM',
-            actions: [
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('View Details'),
-              ),
-            ],
-            rating: 3,
-          ),
-        ],
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore
+            .collection('complaints')
+            .where('userId', isEqualTo: widget.userID)
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No complaints found.'));
+          }
+
+          return ListView(
+            children: snapshot.data!.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return ComplaintCard(
+                status: data['status'] ?? 'Unknown',
+                ticketNo: data['ticketNumber'] ?? 'Unknown',
+                category: data['category'] ?? 'Uncategorized',
+                description: data['complaintDetails'] ?? 'No description provided',
+                imageUrl: (data['images'] as List<dynamic>?)?.first ?? 'https://via.placeholder.com/150',
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Implement Withdraw action if needed
+                    },
+                    child: Text(data['status'] == 'Resolved' ? 'View Details' : 'WITHDRAW'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrackComplaintPage(
+                            ticketNumber: data['ticketNumber'] ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text('TRACK'),
+                  ),
+                ],
+                resolvedBy: data['status'] == 'Resolved' ? 'Some User' : '',
+                resolvedDate: data['status'] == 'Resolved' ? '25 Feb, 3:45 PM' : '',
+                rating: data['status'] == 'Resolved' ? 3 : 0,
+              );
+            }).toList(),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Handle add complaint action
         },
         backgroundColor: Colors.deepPurple,
-        child: Icon(
-          Icons.edit,
-          color: Colors.white,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.0),
-        ),
+        child: Icon(Icons.edit, color: Colors.white),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
       ),
     );
   }
 }
+
 
 class ComplaintCard extends StatelessWidget {
   final String status;
@@ -197,7 +188,7 @@ class ComplaintCard extends StatelessWidget {
               Row(
                 children: List.generate(
                   5,
-                  (index) => Icon(
+                      (index) => Icon(
                     index < rating ? Icons.star : Icons.star_border,
                     color: Colors.amber,
                   ),

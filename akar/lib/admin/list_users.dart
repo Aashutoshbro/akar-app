@@ -1,27 +1,46 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: UsersPage(),
+    );
+  }
+}
+
 class User {
+  final String id;
   final String name;
   final String contact;
   final String email;
   final String? profileImageURL;
+  final String verificationStatus;
 
   User({
+    required this.id,
     required this.name,
     required this.contact,
     required this.email,
     this.profileImageURL,
+    required this.verificationStatus,
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
     var data = doc.data() as Map<String, dynamic>;
 
     return User(
+      id: doc.id,
       name: data['name'] is String ? data['name'] : '',
       contact: data['contact'] is String ? data['contact'] : '',
       email: data['email'] is String ? data['email'] : '',
       profileImageURL: data.containsKey('profileImageURL') && data['profileImageURL'] is String ? data['profileImageURL'] : null,
+      verificationStatus: data.containsKey('verificationStatus') && data['verificationStatus'] is String ? data['verificationStatus'] : 'pending',
     );
   }
 }
@@ -147,12 +166,52 @@ class UserCard extends StatelessWidget {
             Text(user.email),
           ],
         ),
-        trailing: Icon(
-          Icons.visibility,
-          color: Colors.deepPurple,
+        trailing: IconButton(
+          icon: Icon(
+            user.verificationStatus == 'verified' ? Icons.verified : Icons.error,
+            color: user.verificationStatus == 'verified' ? Colors.green : Colors.red,
+          ),
+          onPressed: () {
+            _showVerificationDialog(context, user);
+          },
         ),
         isThreeLine: true,
       ),
     );
+  }
+
+  void _showVerificationDialog(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update Verification Status'),
+          content: Text('Set the verification status for ${user.name}.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _updateVerificationStatus(user, 'pending');
+                Navigator.of(context).pop();
+              },
+              child: Text('Pending'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateVerificationStatus(user, 'verified');
+                Navigator.of(context).pop();
+              },
+              child: Text('Verified'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _updateVerificationStatus(User user, String newStatus) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)  // Use document ID
+        .update({'verificationStatus': newStatus});
   }
 }

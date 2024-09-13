@@ -354,6 +354,7 @@ class _RegisterComplaintFormState extends State<RegisterComplaintForm> {
           'address': address,
           'timestamp': FieldValue.serverTimestamp(),
           'images': imageUrls,
+          'status':'In Progress',
         });
 
         // Show a success message
@@ -999,3 +1000,4 @@ class ShimmerLoading extends StatelessWidget {
     );
   }
 }
+
