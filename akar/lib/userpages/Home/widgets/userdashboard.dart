@@ -252,7 +252,7 @@ class _RoadIssuesDashboardState extends State<RoadIssuesDashboard> {
                 Expanded(
                   child: Center(
                     child: CircularStepProgressIndicator(
-                      totalSteps: total,
+                      totalSteps: total > 0 ? total : 1,
                       currentStep: resolved,
                       stepSize: 10,
                       selectedColor: Colors.white,
@@ -400,7 +400,7 @@ class _RoadIssuesDashboardState extends State<RoadIssuesDashboard> {
                 Expanded(
                   child: Center(
                     child: CircularStepProgressIndicator(
-                      totalSteps: totalIssues,
+                      totalSteps: totalIssues > 0 ? totalIssues : 1,
                       currentStep: inProgressIssues,
                       stepSize: 10,
                       selectedColor: Colors.white,

@@ -28,7 +28,6 @@ class BasePage extends StatefulWidget {
   @override
   _BasePageState createState() => _BasePageState();
 }
-
 Future<void> signOut(BuildContext context) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('userId');
@@ -40,64 +39,24 @@ Future<void> signOut(BuildContext context) async {
 }
 
 class _BasePageState extends State<BasePage> {
-  String? _profileImageURL;
-  File? _profileImage;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileImage();
-  }
-
-  Future<void> _loadProfileImage() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      final userId = user.uid;
-      final prefs = await SharedPreferences.getInstance();
-      _profileImageURL = prefs.getString('profileImageURL');
-
-      if (_profileImageURL == null) {
-        final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-        if (doc.exists) {
-          _profileImageURL = doc['profileImageURL'];
-          await prefs.setString('profileImageURL', _profileImageURL!);
+  Future<String?> _getProfileImageURL() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists && userDoc.data() != null) {
+          return (userDoc.data() as Map<String, dynamic>)['profileImageURL'] as String?;
         }
       }
-
-      if (_profileImageURL != null) {
-        try {
-          final file = await DefaultCacheManager().getSingleFile(_profileImageURL!);
-          setState(() {
-            _profileImage = file;
-          });
-        } catch (e) {
-          print('Error loading profile image: $e');
-        }
-      }
+    } catch (e) {
+      print('Error fetching profile image URL: $e');
     }
+    return null;
   }
 
-  void _reloadProfileImage() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      final userId = user.uid;
-      final prefs = await SharedPreferences.getInstance();
-      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-      if (doc.exists) {
-        _profileImageURL = doc['profileImageURL'];
-        await prefs.setString('profileImageURL', _profileImageURL!);
-        try {
-          final file = await DefaultCacheManager().getSingleFile(_profileImageURL!);
-          setState(() {
-            _profileImage = file;
-          });
-        } catch (e) {
-          print('Error reloading profile image: $e');
-        }
-      }
-    }
-  }
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -270,22 +229,52 @@ class _BasePageState extends State<BasePage> {
                   ),
                 ),
               ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              //   child: SizedBox(
+              //     width: 40,
+              //     height: 40,
+              //     child: GestureDetector(
+              //       onTap: _reloadProfileImage,
+              //       child: CircleAvatar(
+              //         radius: 18,
+              //         backgroundColor: Colors.deepPurple,
+              //         backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+              //         child: _profileImage == null ? const Icon(Icons.person, color: Colors.white, size: 28.0) : null,
+              //       ),
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: SizedBox(
                   width: 40,
                   height: 40,
-                  child: GestureDetector(
-                    onTap: _reloadProfileImage,
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.deepPurple,
-                      backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-                      child: _profileImage == null ? const Icon(Icons.person, color: Colors.white, size: 28.0) : null,
-                    ),
+                  child: FutureBuilder<String?>(
+                    future: _getProfileImageURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircleAvatar(
+                          backgroundColor: Colors.deepPurple,
+                          child: CircularProgressIndicator(color: Colors.white),
+                        );
+                      } else if (snapshot.hasData && snapshot.data != null) {
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(snapshot.data!),
+                          backgroundColor: Colors.deepPurple,
+                        );
+                      } else {
+                        return const CircleAvatar(
+                          // backgroundColor: Colors.deepPurple,
+                          // child: Icon(Icons.person, color: Colors.white, size: 28.0),
+                          backgroundImage: AssetImage("assets/Profile Image.png"),
+                        );
+                      }
+                    },
                   ),
                 ),
               ),
+
             ],
           ),
         ],

@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import 'complaint_history.dart';
 
 class TrackComplaint extends StatefulWidget {
   @override
@@ -8,28 +11,25 @@ class TrackComplaint extends StatefulWidget {
 class _TrackComplaintState extends State<TrackComplaint> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-    );
+    return Scaffold();
   }
 }
 
 class TrackComplaintPage extends StatelessWidget {
+  final ComplaintData complaintData; // Accept the complaint data
+
+  TrackComplaintPage({required this.complaintData});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-            color: Colors.white,),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          'Track Complaint',
-          style: TextStyle(
-            color: Colors.white, // Adjust text color for contrast
-          ),
-        ),
-        backgroundColor: Colors.deepPurple, // Dark purple background for the entire app bar
+        title: Text('Track Complaint', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.deepPurple,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -47,24 +47,35 @@ class TrackComplaintPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.network(
-                    'https://via.placeholder.com/150', // Replace with the actual image URL
+                  complaintData.imageUrl != null && complaintData.imageUrl.isNotEmpty
+                      ? Image.network(
+                    complaintData.imageUrl, // Use image from complaint data
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
-                  ),
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.broken_image, size: 50),
+                  )
+                      : Icon(Icons.image_not_supported, size: 50),
                   SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Poth Holes',
+                          complaintData.category.isNotEmpty
+                              ? complaintData.category
+                              : 'No Category', // Fallback if category is empty
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text('Ticket no. #214'),
                         Text(
-                          'Huge Poth holes causing many accidents',
+                          'Ticket no. ${complaintData.ticketNo.substring(0, 4)}', // Limit ticket number to first 4 digits
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Text(
+                          complaintData.description.isNotEmpty
+                              ? complaintData.description
+                              : 'No Description Available', // Fallback if description is empty
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -74,69 +85,64 @@ class TrackComplaintPage extends StatelessWidget {
                 ],
               ),
             ),
-
             SizedBox(height: 20),
+            // Timeline Section (dynamically fetched from admin progress notes)
+            FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('complaints')
+                  .doc(complaintData.id)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                  return Text('No timeline data available or an error occurred.');
+                }
 
-            // Timeline Section
-            Text(
-              'Complaint Resolved on Mon 19, 20',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView(
-                children: [
-                  TimelineTile(
-                    title: 'Complaint Raised',
-                    date: 'Mon, 19 Oct 20',
-                    description: 'Your complaint has been raised at 2:32 PM',
-                    isCompleted: true,
-                  ),
-                  TimelineTile(
-                    title: 'Task Assigned',
-                    date: 'Mon, 19 Oct 20',
-                    description: 'Admin has assigned the task to Ghoreesh Rana who will attend your complaint around 6 PM',
-                    isCompleted: true,
-                  ),
-                  TimelineTile(
-                    title: 'Staff on Site',
-                    date: 'Mon, 19 Oct 20',
-                    description: 'Staff started attending your complaint at 5:45 PM',
-                    isCompleted: true,
-                  ),
-                  TimelineTile(
-                    title: 'Complaint Resolved',
-                    date: 'Mon, 19 Oct 20',
-                    description: 'Complaint was successfully attended and resolved at 7:20 PM',
-                    isCompleted: false,
-                  ),
-                ],
-              ),
-            ),
+                var data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+                var progressNotes = data['adminProgressNotes'] as List<dynamic>? ?? [];
 
+                if (progressNotes.isEmpty) {
+                  return Text('No progress notes available.');
+                }
+
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: progressNotes.length,
+                    itemBuilder: (context, index) {
+                      var note = progressNotes[index] as Map<String, dynamic>;
+                      return TimelineTile(
+                        title: note['status'] ?? 'Unknown Status', // Handle missing status
+                        date: '', // No date as requested
+                        description: note['note'] ?? 'No additional notes', // Handle missing notes
+                        isCompleted: note['status'] == 'Resolved', // Example condition for completion
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
             SizedBox(height: 20),
             Center(
               child: Padding(
-                padding: EdgeInsets.only(bottom: 10), // Add vertical padding here
+                padding: EdgeInsets.only(bottom: 10), // Add vertical padding
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // Adjust the width as needed
+                  width: MediaQuery.of(context).size.width * 0.8, // Adjust the width
                   height: 1,
                   color: Colors.grey, // Color of the horizontal line
                 ),
               ),
             ),
-            // view details
+            // View details button
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 75.0), // Adjust this value to your preference
+                padding: const EdgeInsets.only(bottom: 75.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Handle reopen complaint action
+                    // Handle view details action
                   },
-                  child: Text(
-                    'View Details',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  child: Text('View Details', style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.deepPurple,
@@ -191,11 +197,8 @@ class TimelineTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(date, style: TextStyle(color: Colors.grey)),
+              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(date.isNotEmpty ? date : '', style: TextStyle(color: Colors.grey)),
               Text(description),
               SizedBox(height: 10),
             ],
