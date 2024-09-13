@@ -5,11 +5,11 @@ class UserGuidePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User Guide'),
-        backgroundColor: Colors.blueAccent,
-      ),
+    return Scaffold(appBar: AppBar(
+      title: Text('User Guide', style: TextStyle(color: Colors.white)),
+      backgroundColor: Colors.deepPurple,
+      iconTheme: IconThemeData(color: Colors.white),
+    ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(
