@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-<<<<<<< HEAD
 import 'complaint_history.dart';
 
 class TrackComplaint extends StatefulWidget {
@@ -17,21 +16,19 @@ class _TrackComplaintState extends State<TrackComplaint> {
 }
 
 class TrackComplaintPage extends StatelessWidget {
-  final ComplaintData complaintData; // Accept the complaint data
-
-  TrackComplaintPage({required this.complaintData});
-=======
-class TrackComplaintPage extends StatelessWidget {
   final String ticketNumber;
+  final ComplaintData complaintData;
 
-  const TrackComplaintPage({Key? key, required this.ticketNumber}) : super(key: key);
->>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
+  const TrackComplaintPage({
+    Key? key,
+    required this.ticketNumber,
+    required this.complaintData,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-<<<<<<< HEAD
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -55,9 +52,9 @@ class TrackComplaintPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  complaintData.imageUrl != null && complaintData.imageUrl.isNotEmpty
+                  complaintData.imageUrl.isNotEmpty
                       ? Image.network(
-                    complaintData.imageUrl, // Use image from complaint data
+                    complaintData.imageUrl,
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
@@ -73,17 +70,17 @@ class TrackComplaintPage extends StatelessWidget {
                         Text(
                           complaintData.category.isNotEmpty
                               ? complaintData.category
-                              : 'No Category', // Fallback if category is empty
+                              : 'No Category',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Ticket no. ${complaintData.ticketNo.substring(0, 4)}', // Limit ticket number to first 4 digits
+                          'Ticket no. ${complaintData.ticketNo.substring(0, 4)}',
                           style: TextStyle(color: Colors.grey),
                         ),
                         Text(
                           complaintData.description.isNotEmpty
                               ? complaintData.description
-                              : 'No Description Available', // Fallback if description is empty
+                              : 'No Description Available',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -121,10 +118,10 @@ class TrackComplaintPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       var note = progressNotes[index] as Map<String, dynamic>;
                       return TimelineTile(
-                        title: note['status'] ?? 'Unknown Status', // Handle missing status
+                        title: note['status'] ?? 'Unknown Status',
                         date: '', // No date as requested
-                        description: note['note'] ?? 'No additional notes', // Handle missing notes
-                        isCompleted: note['status'] == 'Resolved', // Example condition for completion
+                        description: note['note'] ?? 'No additional notes',
+                        isCompleted: note['status'] == 'Resolved',
                       );
                     },
                   ),
@@ -134,11 +131,11 @@ class TrackComplaintPage extends StatelessWidget {
             SizedBox(height: 20),
             Center(
               child: Padding(
-                padding: EdgeInsets.only(bottom: 10), // Add vertical padding
+                padding: EdgeInsets.only(bottom: 10),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // Adjust the width
+                  width: MediaQuery.of(context).size.width * 0.8,
                   height: 1,
-                  color: Colors.grey, // Color of the horizontal line
+                  color: Colors.grey,
                 ),
               ),
             ),
@@ -164,18 +161,10 @@ class TrackComplaintPage extends StatelessWidget {
             ),
           ],
         ),
-=======
-        title: Text('Track Complaint'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Center(
-        child: Text('Tracking complaint with Ticket #: $ticketNumber'),
->>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
       ),
     );
   }
 }
-<<<<<<< HEAD
 
 class TimelineTile extends StatelessWidget {
   final String title;
@@ -183,7 +172,7 @@ class TimelineTile extends StatelessWidget {
   final String description;
   final bool isCompleted;
 
-  TimelineTile({
+  const TimelineTile({
     required this.title,
     required this.date,
     required this.description,
@@ -224,5 +213,3 @@ class TimelineTile extends StatelessWidget {
     );
   }
 }
-=======
->>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995

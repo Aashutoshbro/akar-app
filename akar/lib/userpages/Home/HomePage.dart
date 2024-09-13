@@ -1,12 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:akar/userpages/Home/widgets/userdashboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
-
 
 class UserHomePage extends StatefulWidget {
   final Function(int) onPageChanged;
@@ -18,7 +18,7 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  String userName = 'Guest'; // Default to 'Guest' instead of empty string
+  String userName = 'Guest';
   bool isLoading = true;
 
   @override
@@ -34,12 +34,8 @@ class _UserHomePageState extends State<UserHomePage> {
 
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        print('No user is currently signed in.');
-        return;
-      }
+      if (user == null) return;
 
-      // First, try to get the name from Firestore
       String? firebaseName = await _fetchUserNameFromFirebase(user.uid);
 
       if (firebaseName != null && firebaseName.isNotEmpty) {
@@ -49,20 +45,11 @@ class _UserHomePageState extends State<UserHomePage> {
         });
         await _cacheUserName(firebaseName);
       } else {
-        // If Firestore doesn't have the name, check the cached name
         String? cachedName = await _getCachedUserName();
-        if (cachedName != null && cachedName.isNotEmpty) {
-          setState(() {
-            userName = cachedName;
-            isLoading = false;
-          });
-        } else {
-          // If no name is found, use the email or 'Guest'
-          setState(() {
-            userName = user.email ?? 'Guest';
-            isLoading = false;
-          });
-        }
+        setState(() {
+          userName = cachedName ?? user.email ?? 'Guest';
+          isLoading = false;
+        });
       }
     } catch (e) {
       print('Error loading user name: $e');
@@ -81,8 +68,7 @@ class _UserHomePageState extends State<UserHomePage> {
           .get();
 
       if (userDoc.exists && userDoc.data() != null) {
-        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-        return userData['name'] as String?;
+        return (userDoc.data() as Map<String, dynamic>)['name'] as String?;
       }
     } catch (e) {
       print('Error fetching user name from Firebase: $e');
@@ -93,10 +79,7 @@ class _UserHomePageState extends State<UserHomePage> {
   Future<String?> _getCachedUserName() async {
     try {
       final file = await DefaultCacheManager().getFileFromCache('user_name');
-      if (file != null) {
-        String cachedName = await file.file.readAsString();
-        return cachedName.isNotEmpty ? cachedName : null;
-      }
+      return file?.file.readAsString();
     } catch (e) {
       print('Error reading cached user name: $e');
     }
@@ -114,33 +97,6 @@ class _UserHomePageState extends State<UserHomePage> {
       print('Error caching user name: $e');
     }
   }
-
-
-<<<<<<< HEAD
-=======
-      String userID = user.uid;
-
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userID)
-          .get();
-
-      if (userDoc.exists) {
-        String fetchedName = userDoc.get('name');
-        setState(() {
-          userName = fetchedName;
-        });
-
-        // Cache the fetched name
-        await _cacheUserName(fetchedName);
-      }
-    } catch (e) {
-      print('Error fetching user name: $e');
-    }
-  }
->>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +137,7 @@ class _UserHomePageState extends State<UserHomePage> {
                     ),
                     Text(
                       userName.isNotEmpty ? userName : 'Guest',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -217,7 +173,7 @@ class _UserHomePageState extends State<UserHomePage> {
                             color: Colors.grey.withOpacity(0.2),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -245,7 +201,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                         color: Colors.deepPurple.withOpacity(0.3),
                                         spreadRadius: 2,
                                         blurRadius: 5,
-                                        offset: Offset(0, 3),
+                                        offset: const Offset(0, 3),
                                       ),
                                     ],
                                   ),
@@ -284,7 +240,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                           onPressed: () {
                                             widget.onPageChanged(1);
                                           },
-                                          child: Text("Report Issue", style: TextStyle(color: Colors.white)),
+                                          child: const Text("Report Issue", style: TextStyle(color: Colors.white)),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.deepPurple.withOpacity(0.8),
                                             shape: RoundedRectangleBorder(
@@ -305,9 +261,7 @@ class _UserHomePageState extends State<UserHomePage> {
                       ),
                     ),
                     SizedBox(height: 8),
-
-
-                    RoadIssuesDashboard(userID: FirebaseAuth.instance.currentUser?.uid ?? '', ),
+                    RoadIssuesDashboard(userID: FirebaseAuth.instance.currentUser?.uid ?? ''),
                   ],
                 ),
               ),
@@ -318,5 +272,3 @@ class _UserHomePageState extends State<UserHomePage> {
     );
   }
 }
-
-
