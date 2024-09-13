@@ -1,4 +1,5 @@
 import 'package:akar/admin/home_admin.dart';
+import 'package:akar/admin/review/review_feedback.dart';
 import 'package:flutter/material.dart';
 
 import 'list_users.dart';
@@ -52,6 +53,27 @@ class AdminHomePage extends StatelessWidget {
                 );
               },
             ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: Icon(Icons.reviews),
+              label: Text('View Feedbacks'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                textStyle: TextStyle(fontSize: 18),
+                backgroundColor: Colors.deepPurple[400],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ReviewsPage()),
+                );
+              },
+            ),
+
           ],
         ),
       ),

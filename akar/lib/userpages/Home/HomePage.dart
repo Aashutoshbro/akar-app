@@ -7,7 +7,6 @@ import 'dart:ui';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
 
-import '../messagepage.dart';
 
 class UserHomePage extends StatefulWidget {
   final Function(int) onPageChanged;
@@ -117,6 +116,29 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
 
+<<<<<<< HEAD
+=======
+      String userID = user.uid;
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userID)
+          .get();
+
+      if (userDoc.exists) {
+        String fetchedName = userDoc.get('name');
+        setState(() {
+          userName = fetchedName;
+        });
+
+        // Cache the fetched name
+        await _cacheUserName(fetchedName);
+      }
+    } catch (e) {
+      print('Error fetching user name: $e');
+    }
+  }
+>>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
 
 
 
@@ -285,7 +307,7 @@ class _UserHomePageState extends State<UserHomePage> {
                     SizedBox(height: 8),
 
 
-                    RoadIssuesDashboard(userId: FirebaseAuth.instance.currentUser?.uid ?? ''),
+                    RoadIssuesDashboard(userID: FirebaseAuth.instance.currentUser?.uid ?? '', ),
                   ],
                 ),
               ),

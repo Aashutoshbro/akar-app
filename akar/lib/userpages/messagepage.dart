@@ -1000,3 +1000,4 @@ class ShimmerLoading extends StatelessWidget {
     );
   }
 }
+

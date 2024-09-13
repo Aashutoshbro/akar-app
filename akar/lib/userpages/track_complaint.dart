@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 import 'complaint_history.dart';
 
 class TrackComplaint extends StatefulWidget {
@@ -19,11 +20,18 @@ class TrackComplaintPage extends StatelessWidget {
   final ComplaintData complaintData; // Accept the complaint data
 
   TrackComplaintPage({required this.complaintData});
+=======
+class TrackComplaintPage extends StatelessWidget {
+  final String ticketNumber;
+
+  const TrackComplaintPage({Key? key, required this.ticketNumber}) : super(key: key);
+>>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+<<<<<<< HEAD
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -156,10 +164,18 @@ class TrackComplaintPage extends StatelessWidget {
             ),
           ],
         ),
+=======
+        title: Text('Track Complaint'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Center(
+        child: Text('Tracking complaint with Ticket #: $ticketNumber'),
+>>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
       ),
     );
   }
 }
+<<<<<<< HEAD
 
 class TimelineTile extends StatelessWidget {
   final String title;
@@ -208,3 +224,5 @@ class TimelineTile extends StatelessWidget {
     );
   }
 }
+=======
+>>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995

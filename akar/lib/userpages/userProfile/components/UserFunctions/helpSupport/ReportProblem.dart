@@ -7,7 +7,12 @@ class ReportProblemPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      appBar: AppBar(title: Text('Report a Problem')),
+      appBar: AppBar(
+        title: Text('Report a Problem', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.deepPurple,
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(

@@ -59,8 +59,9 @@ class _ImageCarouselState extends State<ImageCarousel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image Carousel'),
+        title: Text('Image Carousel', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple,
+        iconTheme: IconThemeData(color: Colors.white), // This will make the back button white
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
