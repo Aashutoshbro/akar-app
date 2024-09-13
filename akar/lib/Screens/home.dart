@@ -1,3 +1,5 @@
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class MyHome extends StatefulWidget {
@@ -8,6 +10,15 @@ class MyHome extends StatefulWidget {
 }
 
 class _MyHomeState extends State<MyHome> {
+//   @override
+//   Future<void> initState() async {
+//     // TODO: implement initState
+//     super.initState();
+//     bool? isAutoStartEnabled = await DisableBatteryOptimization.isAutoStartEnabled;
+//     await DisableBatteryOptimization.showEnableAutoStartSettings("Enable Auto Start", "Follow the steps and enable the auto start of this app");
+//     await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+//     await DisableBatteryOptimization.showDisableManufacturerBatteryOptimizationSettings("Your device has additional battery optimization", "Follow the steps and disable the optimizations to allow smooth functioning of this app");
+//   }
   int _clickCount = 0;
   final int _requiredClicks = 5;
 
@@ -24,6 +35,7 @@ class _MyHomeState extends State<MyHome> {
   void _navigateToAdminLogin() {
     Navigator.pushNamed(context, "/admin");
   }
+
 
   @override
   Widget build(BuildContext context) {

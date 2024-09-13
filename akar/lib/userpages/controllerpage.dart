@@ -1,3 +1,4 @@
+import "package:akar/userpages/Home/HomePage.dart";
 import "package:akar/userpages/profilepage.dart";
 import "package:akar/userpages/userProfile/profileScreen.dart";
 import "package:flutter/material.dart";
@@ -8,7 +9,6 @@ import "../Screens/login.dart";
 
 import "homepage.dart";
 import "messagepage.dart";
-import "notificationpage.dart";
 
 class MyCont extends StatefulWidget {
 
@@ -23,11 +23,12 @@ class _MyContState extends State<MyCont> {
 
   late final List<Widget> _pages = [
 
-    HomePage(onPageChanged: _onPageChanged,),
+    UserHomePage(onPageChanged: _onPageChanged,),
     RegisterComplaintForm(),
-    NotificationsPage(),
+    //NotificationsPage(),
     //UserProfile(),
     ProfileScreen(),
+
   ];
 
   void _onPageChanged(int index) {
