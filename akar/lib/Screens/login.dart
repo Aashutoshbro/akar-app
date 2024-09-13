@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../userpages/notification_service.dart';
+import '../userpages/userProfile/firebaseApi.dart';
+
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
@@ -51,6 +54,11 @@ class _SignInPageState extends State<SignInPage> {
         Fluttertoast.showToast(msg: "Login Successfully");
         Navigator.of(context).pop();
         Navigator.pushReplacementNamed(context, "/UserPages");
+
+        //await FirebaseApi().initNotifications();
+        await PushNotifications.init();
+
+
       }
     } on FirebaseAuthException catch (e) {
       Navigator.of(context).pop();
@@ -251,11 +259,12 @@ class _SignInPageState extends State<SignInPage> {
                         height: 10,
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           // Sign in logic
                           if (formKey.currentState!.validate()) {
                             signIn();
                           }
+
                         },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple),

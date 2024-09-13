@@ -7,8 +7,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Screens/home.dart';
 
+class UserSettingsPage extends StatefulWidget {
+  @override
+  _UserSettingsPageState createState() => _UserSettingsPageState();
+}
 
-class UserSettingsPage extends StatelessWidget {
+class _UserSettingsPageState extends State<UserSettingsPage> {
+  bool pushNotifications = true;
+  bool emailNotifications = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,11 +32,14 @@ class UserSettingsPage extends StatelessWidget {
                 'Edit Profile',
                 Icons.person_outline,
                     () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PersonalInformationPage()),
-                      );
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PersonalInformationPage()),
+                  );
+                },
+                    () {
+                  print('Edit Profile icon tapped');
+                  // Add custom logic for icon tap
                 },
               ),
               _buildListTile(
@@ -41,6 +51,10 @@ class UserSettingsPage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => ChangePasswordPage()),
                   );
                 },
+                    () {
+                  print('Change Password icon tapped');
+                  // Add custom logic for icon tap
+                },
               ),
             ],
           ),
@@ -50,17 +64,31 @@ class UserSettingsPage extends StatelessWidget {
               _buildSwitchTile(
                 'Push Notifications',
                 Icons.notifications_none,
-                true,
+                pushNotifications,
                     (bool value) {
+                  setState(() {
+                    pushNotifications = value;
+                  });
                   // Handle push notifications toggle
+                },
+                    () {
+                  print('Push Notifications icon tapped');
+                  // Add custom logic for icon tap
                 },
               ),
               _buildSwitchTile(
                 'Email Notifications',
                 Icons.email_outlined,
-                false,
+                emailNotifications,
                     (bool value) {
+                  setState(() {
+                    emailNotifications = value;
+                  });
                   // Handle email notifications toggle
+                },
+                    () {
+                  print('Email Notifications icon tapped');
+                  // Add custom logic for icon tap
                 },
               ),
             ],
@@ -72,30 +100,42 @@ class UserSettingsPage extends StatelessWidget {
                 'Privacy Policy',
                 Icons.privacy_tip_outlined,
                     () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
-                      );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
+                  );
+                },
+                    () {
+                  print('Privacy Policy icon tapped');
+                  // Add custom logic for icon tap
                 },
               ),
               _buildListTile(
                 'Terms of Service',
                 Icons.description_outlined,
                     () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>TermsOfServiceScreen()),
-                      );
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TermsOfServiceScreen()),
+                  );
+                },
+                    () {
+                  print('Terms of Service icon tapped');
+                  // Add custom logic for icon tap
                 },
               ),
-              _buildListTile(
-                'Log Out',
-                Icons.exit_to_app,
-                    () async {
-                      await signOut(context);
-                },
-              ),
+              // Uncomment this section if you want to include the Log Out option
+              // _buildListTile(
+              //   'Log Out',
+              //   Icons.exit_to_app,
+              //   () async {
+              //     await signOut(context);
+              //   },
+              //   () {
+              //     print('Log Out icon tapped');
+              //     // Add custom logic for icon tap
+              //   },
+              // ),
             ],
           ),
         ],
@@ -124,9 +164,12 @@ class UserSettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildListTile(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildListTile(String title, IconData icon, VoidCallback onTap, VoidCallback onIconTap) {
     return ListTile(
-      leading: Icon(icon),
+      leading: InkWell(
+        onTap: onIconTap,
+        child: Icon(icon),
+      ),
       title: Text(title),
       trailing: Icon(Icons.chevron_right),
       onTap: onTap,
@@ -134,22 +177,27 @@ class UserSettingsPage extends StatelessWidget {
   }
 
   Widget _buildSwitchTile(
-      String title, IconData icon, bool value, ValueChanged<bool> onChanged) {
-    return SwitchListTile(
-      secondary: Icon(icon),
+      String title, IconData icon, bool value, ValueChanged<bool> onChanged, VoidCallback onIconTap) {
+    return ListTile(
+      leading: InkWell(
+        onTap: onIconTap,
+        child: Icon(icon),
+      ),
       title: Text(title),
-      value: value,
-      onChanged: onChanged,
+      trailing: Switch(
+        value: value,
+        onChanged: onChanged,
+      ),
     );
   }
 }
 
-Future<void> signOut(BuildContext context) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('userId');
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(builder: (context) => MyHome()),
-        (Route<dynamic> route) => false,
-  );
-}
+// Future<void> signOut(BuildContext context) async {
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.remove('userId');
+//   Navigator.pushAndRemoveUntil(
+//     context,
+//     MaterialPageRoute(builder: (context) => MyHome()),
+//         (Route<dynamic> route) => false,
+//   );
+// }

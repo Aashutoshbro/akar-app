@@ -68,6 +68,13 @@ dependencies:
   flutter_emoji_feedback: ^0.1.2
   url_launcher: ^6.0.20
   flutter_typeahead: ^4.0.0
+  fl_chart: ^0.60.0
+  step_progress_indicator: ^1.0.2
+  firebase_messaging: ^14.9.4
+  firebase_analytics: ^10.1.0
+  flutter_local_notifications: ^17.2.2
+  font_awesome_flutter: ^10.7.0
+
 
 
 
@@ -88,8 +95,8 @@ flutter_launcher_icons:
 
 
 flutter_native_splash:
-  background_image: "assets/backsplash1.png"
-  image: "assets/Akar_logo.png"
+  background_image: "assets/backsplash2.png"
+  image: "assets/akar2logo.png"
   android: true
 
 

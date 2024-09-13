@@ -120,6 +120,9 @@
       <excludeFolder url="file://$MODULE_DIR$/akar/windows/flutter/ephemeral/.plugin_symlinks/flutter_keyboard_visibility_windows/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/akar/windows/flutter/ephemeral/.plugin_symlinks/flutter_keyboard_visibility_windows/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/akar/windows/flutter/ephemeral/.plugin_symlinks/flutter_keyboard_visibility_windows/build" />
+      <excludeFolder url="file://$MODULE_DIR$/akar/linux/flutter/ephemeral/.plugin_symlinks/flutter_local_notifications_linux/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/akar/linux/flutter/ephemeral/.plugin_symlinks/flutter_local_notifications_linux/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/akar/linux/flutter/ephemeral/.plugin_symlinks/flutter_local_notifications_linux/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
