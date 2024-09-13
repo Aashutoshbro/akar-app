@@ -18,7 +18,8 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  String userName = ''; // Start with an empty string
+  String userName = 'Guest'; // Default to 'Guest' instead of empty string
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -27,21 +28,74 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   Future<void> _loadUserName() async {
-    String? cachedName = await _getCachedUserName();
-    if (cachedName != null) {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('No user is currently signed in.');
+        return;
+      }
+
+      // First, try to get the name from Firestore
+      String? firebaseName = await _fetchUserNameFromFirebase(user.uid);
+
+      if (firebaseName != null && firebaseName.isNotEmpty) {
+        setState(() {
+          userName = firebaseName;
+          isLoading = false;
+        });
+        await _cacheUserName(firebaseName);
+      } else {
+        // If Firestore doesn't have the name, check the cached name
+        String? cachedName = await _getCachedUserName();
+        if (cachedName != null && cachedName.isNotEmpty) {
+          setState(() {
+            userName = cachedName;
+            isLoading = false;
+          });
+        } else {
+          // If no name is found, use the email or 'Guest'
+          setState(() {
+            userName = user.email ?? 'Guest';
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
       setState(() {
-        userName = cachedName;
+        userName = 'Guest';
+        isLoading = false;
       });
-    } else {
-      await _fetchUserNameFromFirebase();
     }
+  }
+
+  Future<String?> _fetchUserNameFromFirebase(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        return userData['name'] as String?;
+      }
+    } catch (e) {
+      print('Error fetching user name from Firebase: $e');
+    }
+    return null;
   }
 
   Future<String?> _getCachedUserName() async {
     try {
       final file = await DefaultCacheManager().getFileFromCache('user_name');
       if (file != null) {
-        return await file.file.readAsString();
+        String cachedName = await file.file.readAsString();
+        return cachedName.isNotEmpty ? cachedName : null;
       }
     } catch (e) {
       print('Error reading cached user name: $e');
@@ -61,14 +115,9 @@ class _UserHomePageState extends State<UserHomePage> {
     }
   }
 
-  Future<void> _fetchUserNameFromFirebase() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        print('No user is currently signed in.');
-        return;
-      }
 
+<<<<<<< HEAD
+=======
       String userID = user.uid;
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -89,6 +138,7 @@ class _UserHomePageState extends State<UserHomePage> {
       print('Error fetching user name: $e');
     }
   }
+>>>>>>> f114e18724d5313e0b02ddf676f7260b17c90995
 
 
 

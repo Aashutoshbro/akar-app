@@ -49,7 +49,9 @@ class ComplaintDetailPage extends StatelessWidget {
           var timestamp = complaintData['timestamp'] as Timestamp;
           var formattedDate = formatTimestamp(timestamp);
           var landmark = complaintData['landmark'];
-          var location = complaintData['location'];
+          var location = complaintData['location'] as GeoPoint;
+          var latitude = location.latitude;
+          var longitude = location.longitude;
           var streetName = complaintData['streetName'];
           //var wardNumber = complaintData['wardNumber'];
 
@@ -196,7 +198,7 @@ class ComplaintDetailPage extends StatelessWidget {
                             Text('$landmark', style: TextStyle(fontSize: 16)),
                             SizedBox(height: 10),
                             Text(
-                              'Location:',
+                              'Location: Latitude $latitude, Longitude $longitude',
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 5),
