@@ -7,7 +7,6 @@ import 'dart:ui';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
 
-import '../messagepage.dart';
 
 class UserHomePage extends StatefulWidget {
   final Function(int) onPageChanged;
@@ -70,11 +69,11 @@ class _UserHomePageState extends State<UserHomePage> {
         return;
       }
 
-      String userId = user.uid;
+      String userID = user.uid;
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userId)
+          .doc(userID)
           .get();
 
       if (userDoc.exists) {
@@ -258,7 +257,7 @@ class _UserHomePageState extends State<UserHomePage> {
                     SizedBox(height: 8),
 
 
-                    RoadIssuesDashboard(userId: FirebaseAuth.instance.currentUser?.uid ?? ''),
+                    RoadIssuesDashboard(userID: FirebaseAuth.instance.currentUser?.uid ?? '', ),
                   ],
                 ),
               ),

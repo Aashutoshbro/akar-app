@@ -2,7 +2,6 @@ import 'package:akar/userpages/track_complaint.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'complaint_history.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,43 +17,23 @@ class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String> _getFullName() async {
+  Future<Map<String, String?>> _getUserDetails() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
         DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(user.uid).get();
+        await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists && userDoc.data() != null) {
-          return userDoc['name'] ?? 'Guest';
-        } else {
-          return 'Guest';
+          return {
+            'name': userDoc['name'] ?? 'Guest',
+            'profileImageURL': userDoc['profileImageURL']
+          };
         }
-      } else {
-        return 'Guest';
       }
+      return {'name': 'Guest', 'profileImageURL': null};
     } catch (e) {
       print('Error fetching user data: $e');
-      return 'Error';
-    }
-  }
-
-  Future<String?> _getProfileImageURL() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(user.uid).get();
-        if (userDoc.exists && userDoc.data() != null) {
-          return userDoc['profileImageURL'];
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Error fetching profile image URL: $e');
-      return null;
+      return {'name': 'Error', 'profileImageURL': null};
     }
   }
 
@@ -67,25 +46,29 @@ class _HomePageState extends State<HomePage> {
           onTap: () {},
           child: Row(
             children: [
-              FutureBuilder<String?>(
-                future: _getProfileImageURL(),
+              FutureBuilder<Map<String, String?>>(
+                future: _getUserDetails(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircleAvatar(
                       backgroundColor: Colors.grey.shade300,
                       child: Icon(Icons.person, color: Colors.purple),
                     );
-                  } else if (snapshot.hasError ||
-                      !snapshot.hasData ||
-                      snapshot.data == null) {
+                  } else if (snapshot.hasError || !snapshot.hasData) {
                     return CircleAvatar(
                       backgroundColor: Colors.grey.shade300,
                       child: Icon(Icons.person, color: Colors.purple),
                     );
                   } else {
+                    var userData = snapshot.data!;
                     return CircleAvatar(
-                      backgroundImage: NetworkImage(snapshot.data!),
+                      backgroundImage: userData['profileImageURL'] != null
+                          ? NetworkImage(userData['profileImageURL']!)
+                          : null,
                       backgroundColor: Colors.grey.shade300,
+                      child: userData['profileImageURL'] == null
+                          ? Icon(Icons.person, color: Colors.purple)
+                          : null,
                     );
                   }
                 },
@@ -98,8 +81,8 @@ class _HomePageState extends State<HomePage> {
                     'Namaste',
                     style: TextStyle(fontSize: 16),
                   ),
-                  FutureBuilder<String>(
-                    future: _getFullName(),
+                  FutureBuilder<Map<String, String?>>(
+                    future: _getUserDetails(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text(
@@ -115,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                         );
                       } else {
                         return Text(
-                          snapshot.data ?? 'Guest',
+                          snapshot.data?['name'] ?? 'Guest',
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         );
@@ -139,38 +122,35 @@ class _HomePageState extends State<HomePage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ComplaintHistory(
-                          onPageChanged: (int) {},
+                    if (_auth.currentUser != null && _auth.currentUser!.uid.isNotEmpty) {
+                      print("Navigating with userID: ${_auth.currentUser!.uid}");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ComplaintHistory(
+                            onPageChanged: widget.onPageChanged,
+                            userID: _auth.currentUser!.uid, // Passing userID
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      print("Error: userID is null or empty");
+                    }
                   },
                   child: Text("Complain History"),
-                )
-                ,
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TrackComplaintPage()),
-                    );
-                  },
-                  child: Text("Track Complaint"),
                 ),
+
               ],
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                widget.onPageChanged(1);
+                widget.onPageChanged(1); // Register Complaint action
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
                 'Register Complaint',

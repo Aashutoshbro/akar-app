@@ -134,7 +134,7 @@ class _ComplaintsHomePageState extends State<ComplaintsHomePage> {
                       itemBuilder: (context, index) {
                         var complaint = complaints[index].data() as Map<String, dynamic>;
                         return ComplaintCard(
-                          name: complaint['fullName'] ?? 'Unknown',
+                          name: complaint['userID'] ?? 'Unknown',
                           time: complaint['timestamp'] != null ? (complaint['timestamp'] as Timestamp).toDate().toString() : 'Unknown',
                           complaintId: complaint['ticketNumber'] ?? 'Unknown',
                           complaintText: complaint['complaintDetails'] ?? 'No details provided',

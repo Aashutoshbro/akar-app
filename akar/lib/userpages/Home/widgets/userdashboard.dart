@@ -9,9 +9,9 @@ import 'package:akar/userpages/complaint_history.dart';
 import 'communityImpact.dart';
 
 class RoadIssuesDashboard extends StatefulWidget {
-  final String userId;
+  final String userID;
 
-  const RoadIssuesDashboard({Key? key, required this.userId}) : super(key: key);
+  const RoadIssuesDashboard({Key? key, required this.userID}) : super(key: key);
 
   @override
   State<RoadIssuesDashboard> createState() => _RoadIssuesDashboardState();
@@ -38,19 +38,19 @@ class _RoadIssuesDashboardState extends State<RoadIssuesDashboard> {
       // Get total complaints for the user
       QuerySnapshot totalSnapshot = await firestore
           .collection('complaints')
-          .where('userID', isEqualTo: widget.userId)
+          .where('userID', isEqualTo: widget.userID)
           .get();
 
       // Get resolved complaints for the user
       QuerySnapshot resolvedSnapshot = await firestore
           .collection('complaints')
-          .where('userID', isEqualTo: widget.userId)
+          .where('userID', isEqualTo: widget.userID)
           .where('status', isEqualTo: 'Complaint Resolved')
           .get();
 
       QuerySnapshot inProgressSnapshot = await firestore
           .collection('complaints')
-          .where('userID', isEqualTo: widget.userId)
+          .where('userID', isEqualTo: widget.userID)
           .where('status', isEqualTo: 'In Progress')
           .get();
 
@@ -149,7 +149,7 @@ class _RoadIssuesDashboardState extends State<RoadIssuesDashboard> {
             builder: (context) => ComplaintHistory(
               onPageChanged: (int pageIndex) {
                 // Handle page change actions if needed
-              },
+              }, userID: '',
             ),
           ),
         );
@@ -174,7 +174,7 @@ class _RoadIssuesDashboardState extends State<RoadIssuesDashboard> {
         children: [
           _buildResolvedIssuesCard(cardWidth),
           _buildIssueStatusCard(cardWidth),
-          IssueTypeCard(cardWidth: cardWidth, userId: widget.userId),
+          IssueTypeCard(cardWidth: cardWidth, userId: widget.userID),
 
           CommunityImpactCard(cardWidth,feedbackCollectionPath: 'feedback'),
           // Add more cards if needed...
