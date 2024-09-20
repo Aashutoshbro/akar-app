@@ -39,8 +39,7 @@ class ComplaintDetailPage extends StatelessWidget {
 
           var complaintData = snapshot.data!;
           var name = complaintData['userID'];
-          //var phoneNumber = complaintData['phoneNumber'];
-          //var citizenshipNumber = complaintData['citizenshipNumber'];
+
           var ticketNumber = complaintData['ticketNumber'];
           var complaintDetails = complaintData['complaintDetails'];
           var complaintType = complaintData['complaintType'];
@@ -53,7 +52,7 @@ class ComplaintDetailPage extends StatelessWidget {
           var latitude = location.latitude;
           var longitude = location.longitude;
           var streetName = complaintData['streetName'];
-          //var wardNumber = complaintData['wardNumber'];
+
 
           return SingleChildScrollView(
             child: Padding(
@@ -76,14 +75,6 @@ class ComplaintDetailPage extends StatelessWidget {
                               name,
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            // Text(
-                            //   'Contact: $phoneNumber',
-                            //   style: TextStyle(color: Colors.grey[600]),
-                            // ),
-                            // Text(
-                            //   'Cid: $citizenshipNumber',
-                            //   style: TextStyle(color: Colors.grey[600]),
-                            // ),
                             Text(
                               'Ticket: $ticketNumber',
                               style: TextStyle(color: Colors.grey[600]),

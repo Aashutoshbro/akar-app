@@ -261,6 +261,10 @@ class _UserHomePageState extends State<UserHomePage> {
                       ),
                     ),
                     SizedBox(height: 8),
+<<<<<<< Updated upstream
+=======
+                    // The RoadIssuesDashboard now properly gets the current user's ID
+>>>>>>> Stashed changes
                     RoadIssuesDashboard(userID: FirebaseAuth.instance.currentUser?.uid ?? ''),
                   ],
                 ),

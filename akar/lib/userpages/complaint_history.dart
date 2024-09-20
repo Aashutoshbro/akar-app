@@ -68,7 +68,11 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
+<<<<<<< Updated upstream
                               builder: (context) => TrackComplaintPage(complaintData: complaint, ticketNumber: '',)),
+=======
+                              builder: (context) => TrackComplaintPage(complaintData: complaint,)),
+>>>>>>> Stashed changes
                         );
                       },
                       child: Text('TRACK'),
@@ -80,6 +84,7 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
           }
         },
       ),
+<<<<<<< Updated upstream
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Handle add complaint action
@@ -93,6 +98,21 @@ class _ComplaintHistoryState extends State<ComplaintHistory> {
           borderRadius: BorderRadius.circular(50.0),
         ),
       ),
+=======
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Handle add complaint action
+      //   },
+      //   backgroundColor: Colors.deepPurple,
+      //   child: Icon(
+      //     Icons.edit,
+      //     color: Colors.white,
+      //   ),
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(50.0),
+      //   ),
+      // ),
+>>>>>>> Stashed changes
     );
   }
 

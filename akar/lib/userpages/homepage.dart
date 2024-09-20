@@ -1,3 +1,7 @@
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 import 'package:akar/userpages/track_complaint.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -163,3 +167,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
