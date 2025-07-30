@@ -1,3 +1,7 @@
+Here is our final pdf about our project:
+[Formal-final-8sem-black-book (1).pdf](https://github.com/user-attachments/files/21501231/Formal-final-8sem-black-book.1.pdf)
+
+
 # AKAR Flutter Project Contribution Guide
 
 This guide will help you fork a Flutter project from GitHub, set it up, make changes, and send a pull request back to the original repository.
@@ -98,3 +102,6 @@ This guide will help you fork a Flutter project from GitHub, set it up, make cha
  a suite of performance and debugging tools.
 
 By following these steps, you should be able to fork a Flutter project from GitHub, set it up, make changes, and send a pull request back to the original repository. If you encounter any issues, just leave a comment.
+
+Here is our final pdf about our project:
+[Formal-final-8sem-black-book (1).pdf](https://github.com/user-attachments/files/21501231/Formal-final-8sem-black-book.1.pdf)
